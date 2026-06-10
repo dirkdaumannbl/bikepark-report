@@ -1,2 +1,3 @@
 # Only index.html is published to GitHub Pages; dated drafts stay local.
 bikepark-report-*.html
+_gcbatch*.html
