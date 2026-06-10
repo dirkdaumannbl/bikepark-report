@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bikepark Research Report</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d212b; --line:#2a2f3a;
+    --txt:#e8eaed; --muted:#9aa3b2; --accent:#34d399; --accent2:#60a5fa;
+    --green:#22c55e; --blue:#3b82f6; --red:#ef4444; --black:#111827;
+    --warn:#f59e0b; --radius:14px;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f6f9; --card:#ffffff; --card2:#f0f3f7; --line:#e2e6ec;
+           --txt:#161a20; --muted:#5b6472; --black:#1f2937; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:32px 20px 80px}
+  header.report{margin-bottom:28px}
+  header.report h1{font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
+  .meta{color:var(--muted);font-size:14px}
+  .meta b{color:var(--txt)}
+  /* collapsible sections */
+  details.sec{margin:30px 0 0}
+  details.sec>summary, details.park>summary{
+    list-style:none;cursor:pointer;user-select:none;display:flex;align-items:center;gap:10px}
+  details.sec>summary::-webkit-details-marker, details.park>summary::-webkit-details-marker{display:none}
+  details.sec>summary::before, details.park>summary::before{
+    content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
+    transform:rotate(-45deg);transition:transform .15s ease;flex:none}
+  details[open].sec>summary::before, details[open].park>summary::before{transform:rotate(45deg)}
+  h2.section{font-size:22px;margin:0;padding-bottom:8px}
+  details.sec>summary{border-bottom:1px solid var(--line);padding-bottom:8px;margin:18px 0 14px}
+  details.sec>summary h2.section{border:none;padding-bottom:0}
+  /* map */
+  #map{height:440px;width:100%;border:1px solid var(--line);border-radius:var(--radius);background:var(--card2)}
+  .map-fallback{padding:18px;border:1px dashed var(--line);border-radius:var(--radius);
+    color:var(--muted);font-size:14px}
+  /* Overview table */
+  .overview{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius)}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--card2);font-weight:600;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  td a{color:var(--accent2)}
+  /* Park cards */
+  .park{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 24px;margin:22px 0}
+  details.park>summary{margin:0}
+  details.park[open]>summary{margin-bottom:8px}
+  details.park>summary .pk-title{font-size:22px;font-weight:600}
+  details.park>summary .pk-region{color:var(--muted);font-size:14px;font-weight:400}
+  .grp{margin:18px 0}
+  .grp h4{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
+    margin:0 0 8px}
+  .kv{display:grid;grid-template-columns:210px 1fr;gap:6px 18px}
+  .kv dt{color:var(--muted)}
+  .kv dd{margin:0}
+  @media (max-width:620px){.kv{grid-template-columns:1fr}.kv dt{margin-top:8px}}
+  /* difficulty badges */
+  .badges{display:inline-flex;gap:6px;flex-wrap:wrap}
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:999px;
+    font-size:12px;font-weight:600;color:#fff}
+  .badge .dot{width:8px;height:8px;border-radius:50%;background:#fff}
+  .b-green{background:var(--green)} .b-blue{background:var(--blue)}
+  .b-red{background:var(--red)} .b-black{background:var(--black)}
+  /* source links + flags */
+  .src{font-size:12px;color:var(--accent2);text-decoration:none;white-space:nowrap}
+  .src:hover{text-decoration:underline}
+  sup.ref a{color:var(--accent2);text-decoration:none;font-weight:600}
+  .nf{color:var(--warn);font-style:italic}
+  .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600;
+    border:1px solid var(--line)}
+  .pill.yes{color:var(--green);border-color:var(--green)}
+  .pill.no{color:var(--muted)}
+  .pill.belt{color:var(--accent2);border-color:var(--accent2)}
+  details.sources{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);font-size:13px}
+  details.sources>summary{cursor:pointer;color:var(--muted);font-weight:600;user-select:none}
+  .sources ol{margin:6px 0 0;padding-left:20px}
+  .sources a{color:var(--accent2);word-break:break-all}
+  footer{margin-top:50px;color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="report">
+    <h1>Bikepark Research Report</h1>
+    <div class="meta">
+      <b>5</b> park(s) &middot; generated 2026-06-10 &middot;
+      driving distances via Google Maps from <b>Oskar-Helene-Park 7, 14195 Berlin</b><br>
+      Every value links to a source. Items that could not be verified are marked
+      <span class="nf">Not found</span>.
+    </div>
+  </header>
+
+  <details class="sec" open>
+    <summary><h2 class="section">Map</h2></summary>
+    <div id="map"></div>
+  </details>
+
+  <details class="sec" open>
+    <summary><h2 class="section">Overview</h2></summary>
+    <div class="overview">
+      <table>
+        <thead>
+          <tr>
+            <th>Park</th><th>Location</th><th>Drive from Berlin</th><th>Lift</th>
+            <th>Season</th><th>Gravity Card</th><th>Difficulty spread</th>
+            <th>Vertical</th><th>Skills area</th><th>Best for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Bikepark Willingen</b></td>
+            <td>Willingen (Upland), Hesse, Germany</td>
+            <td>447 km &middot; ~5 h 3 min</td>
+            <td>Cable car (gondola) + 8-seat chairlift</td>
+            <td>28 Mar – 8 Nov 2025</td>
+            <td><span class="pill yes">Yes</span></td>
+            <td><span class="badges"><span class="badge b-blue"><span class="dot"></span>2</span><span class="badge b-red"><span class="dot"></span>1</span><span class="badge b-black"><span class="dot"></span>1</span></span><br><span style="font-size:12px;color:var(--muted)">~10 trails total, colour split partly <span class="nf">Not found</span></span></td>
+            <td>~250 m</td>
+            <td>Training parcours (no magic-carpet belt)</td>
+            <td>All-round park &amp; jumps</td>
+          </tr>
+          <tr>
+            <td><b>Bikepark Winterberg</b></td>
+            <td>Winterberg, NRW (Sauerland), Germany</td>
+            <td>457 km &middot; ~5 h 13 min</td>
+            <td>3 lifts (6-seat + 4-seat chairlifts)</td>
+            <td>24 Apr – 8 Nov 2026</td>
+            <td><span class="pill yes">Yes</span></td>
+            <td><span class="badges"><span class="badge b-green"><span class="dot"></span>3</span><span class="badge b-blue"><span class="dot"></span>4</span><span class="badge b-red"><span class="dot"></span>6</span><span class="badge b-black"><span class="dot"></span>2</span></span></td>
+            <td>~180 m</td>
+            <td>Practice course + free kids' course (no belt)</td>
+            <td>Variety, jumps &amp; families</td>
+          </tr>
+          <tr>
+            <td><b>Green Hill Bikepark</b></td>
+            <td>Gellinghausen, Schmallenberg (Sauerland), Germany</td>
+            <td>480 km &middot; ~5 h 17 min</td>
+            <td>2 easyLOOP tow lifts</td>
+            <td>Thu–Sun (Apr–Oct); see hours</td>
+            <td><span class="pill no">No</span></td>
+            <td><span class="badges"><span class="badge b-green"><span class="dot"></span>&nbsp;</span><span class="badge b-blue"><span class="dot"></span>&nbsp;</span><span class="badge b-red"><span class="dot"></span>&nbsp;</span><span class="badge b-black"><span class="dot"></span>&nbsp;</span></span><br><span style="font-size:12px;color:var(--muted)">11 trails; per-colour counts <span class="nf">Not found</span></span></td>
+            <td>~200 m</td>
+            <td>Valley practice course (tow-lift, no belt)</td>
+            <td>Canadian-style flow &amp; jumps</td>
+          </tr>
+          <tr>
+            <td><b>Bikepark Geißkopf</b></td>
+            <td>Bischofsmais, Bavaria (Bayerischer Wald), Germany</td>
+            <td>542 km &middot; ~5 h 50 min</td>
+            <td>Chairlift + drag lift (2021 lift)</td>
+            <td>~May – Nov (Wed–Sun)</td>
+            <td><span class="pill yes">Yes</span></td>
+            <td><span class="badges"><span class="badge b-green"><span class="dot"></span>2</span><span class="badge b-red"><span class="dot"></span>5</span><span class="badge b-black"><span class="dot"></span>2</span></span><br><span style="font-size:12px;color:var(--muted)">~13–15 trails total</span></td>
+            <td>242 m</td>
+            <td>Übungsparcours + kids' course (no belt)</td>
+            <td>Flow, families &amp; variety</td>
+          </tr>
+          <tr>
+            <td><b>Trail Park Klínovec</b></td>
+            <td>Klínovec / Boží Dar, Karlovy Vary region, Czech Republic</td>
+            <td>329 km &middot; ~3 h 44 min</td>
+            <td>4-seat bubble chairlift</td>
+            <td>May – early Nov</td>
+            <td><span class="pill yes">Yes</span></td>
+            <td><span class="badges"><span class="badge b-blue"><span class="dot"></span>1</span><span class="badge b-red"><span class="dot"></span>1</span><span class="badge b-black"><span class="dot"></span>1</span></span><br><span style="font-size:12px;color:var(--muted)">+2 "orange" expert lines &middot; 5 main trails</span></td>
+            <td>~387–500 m</td>
+            <td>Skillcentrum + pump track (no belt)</td>
+            <td>Marathon flow descents</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details class="sec" open>
+    <summary><h2 class="section">Parks in detail</h2></summary>
+
+    <!-- ===================== PARK 1: WILLINGEN ===================== -->
+    <details class="park" open>
+      <summary><span class="pk-title">1. Bikepark Willingen (MTB Zone)</span> &nbsp;<span class="pk-region">Willingen (Upland), Hesse, Germany</span></summary>
+
+      <div class="grp">
+        <h4>Access &amp; logistics</h4>
+        <dl class="kv">
+          <dt>Country</dt><dd>Germany</dd>
+          <dt>Region</dt><dd>Hochsauerland border, Upland, Hesse <sup class="ref"><a href="#p1-s2">[2]</a></sup></dd>
+          <dt>Address</dt><dd>Zur Ruthenaar 3, 34508 Willingen (Upland) <sup class="ref"><a href="#p1-s5">[5]</a></sup></dd>
+          <dt>Coordinates</dt><dd>51.2896, 8.5935 <sup class="ref"><a href="#p1-s5">[5]</a></sup></dd>
+          <dt>Drive from Berlin</dt><dd>447 km &middot; ~5 h 3 min (Google Directions from Oskar-Helene-Park 7, 14195 Berlin) <sup class="ref"><a href="#p1-s6">[6]</a></sup></dd>
+          <dt>Lift type</dt><dd>Ettelsberg cable car (gondola) for the harder left side + an 8-seat chairlift (K1, Köhlerhagen) for the easier right side <sup class="ref"><a href="#p1-s1">[1]</a></sup><sup class="ref"><a href="#p1-s4">[4]</a></sup></dd>
+          <dt>Uplift capacity</dt><dd><span class="nf">Not found</span> (stated only as gondola + 8-seat chairlift)</dd>
+          <dt>Season &amp; hours</dt><dd>Bike season 28 Mar – 8 Nov 2025; lifts daily 09:00–17:00 <sup class="ref"><a href="#p1-s3">[3]</a></sup></dd>
+          <dt>Gravity Card</dt><dd><span class="pill yes">Yes</span> — listed in the Gravity Card network <sup class="ref"><a href="#p1-s7">[7]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Trails</h4>
+        <dl class="kv">
+          <dt>Character</dt><dd>Diddie-Schneider-designed all-round gravity park with flow, freeride, downhill, north-shore, jump and enduro lines spread over two lift-served sides of the Ettelsberg. <sup class="ref"><a href="#p1-s7">[7]</a></sup></dd>
+          <dt>Trail types</dt><dd>Flow, freeride, downhill, 4X/biker-cross, north-shore, jump lines, enduro, pump track <sup class="ref"><a href="#p1-s7">[7]</a></sup></dd>
+          <dt>Difficulty spread</dt><dd><span class="badges"><span class="badge b-blue"><span class="dot"></span>2</span><span class="badge b-red"><span class="dot"></span>1</span><span class="badge b-black"><span class="dot"></span>1</span></span> directory lists 1 black DH, 1 blue freeride, 1 blue flow + practice course; full colour split of all ~10 trails <span class="nf">Not found</span> <sup class="ref"><a href="#p1-s2">[2]</a></sup><sup class="ref"><a href="#p1-s1">[1]</a></sup></dd>
+          <dt>Total trails</dt><dd>10 trails, 15.6 km combined length <sup class="ref"><a href="#p1-s1">[1]</a></sup></dd>
+          <dt>Vertical drop</dt><dd>~250 m <sup class="ref"><a href="#p1-s2">[2]</a></sup></dd>
+          <dt>Longest descent</dt><dd>~2,800 m <sup class="ref"><a href="#p1-s2">[2]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Features &amp; suitability</h4>
+        <dl class="kv">
+          <dt>Family friendliness</dt><dd>Easier right-hand side with flow trail + training parcours suits families; directory notes limited base amenities <sup class="ref"><a href="#p1-s1">[1]</a></sup><sup class="ref"><a href="#p1-s2">[2]</a></sup></dd>
+          <dt>Beginner-friendliness</dt><dd>Dedicated Training Parcours and easy Flow Trail for novices <sup class="ref"><a href="#p1-s1">[1]</a></sup></dd>
+          <dt>Skills area</dt><dd>Yes — "Training Parcours". <span class="pill no">Not a belt/magic-carpet</span> area (riders use the chairlift/cable car); no conveyor lift reported <sup class="ref"><a href="#p1-s1">[1]</a></sup></dd>
+          <dt>Standout features</dt><dd>Jump lines, north-shore and a dedicated freeride/4X; host venue with a bike school at the lift areas <sup class="ref"><a href="#p1-s7">[7]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Practical</h4>
+        <dl class="kv">
+          <dt>Bike shop / repair</dt><dd>Two bike rental shops + workshop ("Werkstatt") at the base <sup class="ref"><a href="#p1-s7">[7]</a></sup><sup class="ref"><a href="#p1-s2">[2]</a></sup></dd>
+          <dt>Bike wash</dt><dd><span class="pill yes">Yes</span> — bike wash at base station <sup class="ref"><a href="#p1-s2">[2]</a></sup></dd>
+          <dt>Camper / camping</dt><dd>Wohnmobilpark Willingen at the foot of the Ettelsberg (~€20/night motorhome, ~€28 caravan + spa tax); other campsites nearby <sup class="ref"><a href="#p1-s8">[8]</a></sup></dd>
+          <dt>Reputation</dt><dd>Bikepark-online community rating ~3.5/5; valued as a versatile, well-built park <sup class="ref"><a href="#p1-s2">[2]</a></sup></dd>
+        </dl>
+      </div>
+
+      <details class="sources">
+        <summary>Sources</summary>
+        <div class="sources">
+          <ol>
+            <li id="p1-s1"><a href="https://mtbzone-bikepark.com/en/willingen" target="_blank" rel="noopener">MTB Zone Bikepark Willingen — official site (trails, lifts, hours)</a></li>
+            <li id="p1-s2"><a href="https://www.bikepark-online.de/bikeparks/deutschland/bikepark-willingen/" target="_blank" rel="noopener">Bikepark-online.de — Willingen profile (vertical, longest descent, rating)</a></li>
+            <li id="p1-s3"><a href="https://mtbzone-bikepark.com/en/willingen/opening-hours" target="_blank" rel="noopener">MTB Zone — Willingen opening hours &amp; season</a></li>
+            <li id="p1-s4"><a href="https://k1-willingen.de/" target="_blank" rel="noopener">K1 Willingen — 8-seat Köhlerhagen chairlift</a></li>
+            <li id="p1-s5"><a href="https://maps.googleapis.com/maps/api/geocode/json?address=MTB+Zone+Bikepark+Willingen,+Germany" target="_blank" rel="noopener">Google Geocoding API — address &amp; coordinates</a></li>
+            <li id="p1-s6"><a href="https://maps.googleapis.com/maps/api/directions/json?origin=Oskar-Helene-Park+7,+14195+Berlin&destination=51.2895974,8.5934781" target="_blank" rel="noopener">Google Directions API — Berlin → Willingen (447 km / 5 h 3 min)</a></li>
+            <li id="p1-s7"><a href="https://www.gravity-card.com/bikeparks/mtb-zone-bikepark-willingen/?lang=en" target="_blank" rel="noopener">Gravity Card — Willingen membership &amp; park facts</a></li>
+            <li id="p1-s8"><a href="https://www.wohnmobilpark-willingen.de/" target="_blank" rel="noopener">Wohnmobilpark Willingen — camper-van pitches &amp; prices</a></li>
+          </ol>
+        </div>
+      </details>
+    </details>
+
+    <!-- ===================== PARK 2: WINTERBERG ===================== -->
+    <details class="park" open>
+      <summary><span class="pk-title">2. Bikepark Winterberg</span> &nbsp;<span class="pk-region">Winterberg, NRW (Sauerland), Germany</span></summary>
+
+      <div class="grp">
+        <h4>Access &amp; logistics</h4>
+        <dl class="kv">
+          <dt>Country</dt><dd>Germany</dd>
+          <dt>Region</dt><dd>Winterberg, Hochsauerlandkreis, North Rhine-Westphalia <sup class="ref"><a href="#p2-s4">[4]</a></sup></dd>
+          <dt>Address</dt><dd>Kapperundweg 3, 59955 Winterberg <sup class="ref"><a href="#p2-s4">[4]</a></sup></dd>
+          <dt>Coordinates</dt><dd>51.1852, 8.5046 <sup class="ref"><a href="#p2-s4">[4]</a></sup></dd>
+          <dt>Drive from Berlin</dt><dd>457 km &middot; ~5 h 13 min (Google Directions from Oskar-Helene-Park 7, 14195 Berlin) <sup class="ref"><a href="#p2-s5">[5]</a></sup></dd>
+          <dt>Lift type</dt><dd>3 lifts — a 6-seat main chairlift plus a 4-seat auxiliary chairlift (used as needed) <sup class="ref"><a href="#p2-s1">[1]</a></sup><sup class="ref"><a href="#p2-s3">[3]</a></sup></dd>
+          <dt>Uplift capacity</dt><dd>6-person + 4-person chairs; exact riders/hour <span class="nf">Not found</span> <sup class="ref"><a href="#p2-s3">[3]</a></sup></dd>
+          <dt>Season &amp; hours</dt><dd>Season 24 Apr – 8 Nov 2026; trails &amp; lifts 09:30–17:30, shop/rental 09:00–18:00 <sup class="ref"><a href="#p2-s1">[1]</a></sup></dd>
+          <dt>Gravity Card</dt><dd><span class="pill yes">Yes</span> — participates in the Gravity Card network <sup class="ref"><a href="#p2-s3">[3]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Trails</h4>
+        <dl class="kv">
+          <dt>Character</dt><dd>"The Mother" of German bike parks — a high-throughput, variety-packed park famous for one of Europe's few public big-jump slopestyle areas alongside flow, freeride and a redesigned race track. <sup class="ref"><a href="#p2-s6">[6]</a></sup></dd>
+          <dt>Trail types</dt><dd>Flow, freeride, downhill race (Continental Track), north-shore, slopestyle/jump lines, pump track <sup class="ref"><a href="#p2-s6">[6]</a></sup></dd>
+          <dt>Difficulty spread</dt><dd><span class="badges"><span class="badge b-green"><span class="dot"></span>3</span><span class="badge b-blue"><span class="dot"></span>4</span><span class="badge b-red"><span class="dot"></span>6</span><span class="badge b-black"><span class="dot"></span>2</span></span> (very easy / easy / medium / hard, per official site) <sup class="ref"><a href="#p2-s1">[1]</a></sup></dd>
+          <dt>Total trails</dt><dd>~15–18 routes (official site groups ~18 named runs; directories cite ~11–16) <sup class="ref"><a href="#p2-s1">[1]</a></sup><sup class="ref"><a href="#p2-s3">[3]</a></sup></dd>
+          <dt>Vertical drop</dt><dd>~180 m <sup class="ref"><a href="#p2-s3">[3]</a></sup></dd>
+          <dt>Longest descent</dt><dd>1,650 m (SRAM Flow Country) <sup class="ref"><a href="#p2-s3">[3]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Features &amp; suitability</h4>
+        <dl class="kv">
+          <dt>Family friendliness</dt><dd>Strong — free no-ticket beginner &amp; kids' course; whole families catered for <sup class="ref"><a href="#p2-s1">[1]</a></sup><sup class="ref"><a href="#p2-s6">[6]</a></sup></dd>
+          <dt>Beginner-friendliness</dt><dd>Free beginner &amp; kids' course (no ticket required) plus easy flow line <sup class="ref"><a href="#p2-s1">[1]</a></sup></dd>
+          <dt>Skills area</dt><dd>Yes — practice course ("Übungsparcours") with drops, tables, step-ups and north-shore elements, plus pump track. <span class="pill no">Not a belt/magic-carpet</span> (riders self-pedal / use the lift); no conveyor reported <sup class="ref"><a href="#p2-s3">[3]</a></sup><sup class="ref"><a href="#p2-s6">[6]</a></sup></dd>
+          <dt>Standout features</dt><dd>Public big-jump slopestyle area (massive wallride, whale tail, boner log, whip-off) — one of few in Europe; redesigned Continental race track <sup class="ref"><a href="#p2-s6">[6]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Practical</h4>
+        <dl class="kv">
+          <dt>Bike shop / repair</dt><dd>On-site workshop + Ghost/Giant rental fleet <sup class="ref"><a href="#p2-s1">[1]</a></sup><sup class="ref"><a href="#p2-s3">[3]</a></sup></dd>
+          <dt>Bike wash</dt><dd><span class="pill yes">Yes</span> — bike-wash at three locations <sup class="ref"><a href="#p2-s1">[1]</a></sup></dd>
+          <dt>Camper / camping</dt><dd>No on-site camping; Hostel Erlebnisberg Kappe ~250 m away; town campsites nearby <sup class="ref"><a href="#p2-s3">[3]</a></sup></dd>
+          <dt>Reputation</dt><dd>Bikepark-online rating ~4.3/5 — "super bikepark for each level, much variety, unfortunately quite limited elevation gain" <sup class="ref"><a href="#p2-s3">[3]</a></sup></dd>
+        </dl>
+      </div>
+
+      <details class="sources">
+        <summary>Sources</summary>
+        <div class="sources">
+          <ol>
+            <li id="p2-s1"><a href="https://www.bikepark-winterberg.de/?lang=eng" target="_blank" rel="noopener">Bikepark Winterberg — official site (season, hours, lifts, difficulty split, kids' course)</a></li>
+            <li id="p2-s2"><a href="https://www.bikepark-winterberg.de/strecken" target="_blank" rel="noopener">Bikepark Winterberg — Strecken (trail list &amp; status)</a></li>
+            <li id="p2-s3"><a href="https://www.bikepark-online.de/bikeparks/deutschland/bikepark-winterberg/" target="_blank" rel="noopener">Bikepark-online.de — Winterberg profile (vertical, longest descent, Gravity Card, rating)</a></li>
+            <li id="p2-s4"><a href="https://maps.googleapis.com/maps/api/geocode/json?address=Bikepark+Winterberg,+Germany" target="_blank" rel="noopener">Google Geocoding API — address &amp; coordinates</a></li>
+            <li id="p2-s5"><a href="https://maps.googleapis.com/maps/api/directions/json?origin=Oskar-Helene-Park+7,+14195+Berlin&destination=51.185196,8.504557" target="_blank" rel="noopener">Google Directions API — Berlin → Winterberg (457 km / 5 h 13 min)</a></li>
+            <li id="p2-s6"><a href="https://www.bikepark-bau.de/tag/bikepark-winterberg/" target="_blank" rel="noopener">Turbomatik / Bikepark-bau — Continental Track &amp; slopestyle build notes</a></li>
+          </ol>
+        </div>
+      </details>
+    </details>
+
+    <!-- ===================== PARK 3: GREEN HILL ===================== -->
+    <details class="park" open>
+      <summary><span class="pk-title">3. Green Hill Bikepark</span> &nbsp;<span class="pk-region">Gellinghausen, Schmallenberg (Sauerland), Germany</span></summary>
+
+      <div class="grp">
+        <h4>Access &amp; logistics</h4>
+        <dl class="kv">
+          <dt>Country</dt><dd>Germany (Sauerland — not the Slovak park of a similar name)</dd>
+          <dt>Region</dt><dd>Gellinghausen, Schmallenberg, Hochsauerlandkreis, NRW <sup class="ref"><a href="#p3-s4">[4]</a></sup></dd>
+          <dt>Address</dt><dd>Gellinghausen 42–44, 57392 Schmallenberg <sup class="ref"><a href="#p3-s4">[4]</a></sup></dd>
+          <dt>Coordinates</dt><dd>51.2353, 8.3569 <sup class="ref"><a href="#p3-s4">[4]</a></sup></dd>
+          <dt>Drive from Berlin</dt><dd>480 km &middot; ~5 h 17 min (Google Directions from Oskar-Helene-Park 7, 14195 Berlin) <sup class="ref"><a href="#p3-s5">[5]</a></sup></dd>
+          <dt>Lift type</dt><dd>Two parallel easyLOOP tow lifts (purpose-built for MTB; rope clips behind the stem) <sup class="ref"><a href="#p3-s1">[1]</a></sup><sup class="ref"><a href="#p3-s6">[6]</a></sup></dd>
+          <dt>Uplift capacity</dt><dd><span class="nf">Not found</span></dd>
+          <dt>Season &amp; hours</dt><dd>Thu 15:00–19:00 (Afterwork), Fri–Sun 10:00–18:00; Mon–Wed pop-up rides; season ~Apr–Oct (check date-picker) <sup class="ref"><a href="#p3-s1">[1]</a></sup></dd>
+          <dt>Gravity Card</dt><dd><span class="pill no">No</span> — operator states it is "currently not included in the Gravity Card" <sup class="ref"><a href="#p3-s1">[1]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Trails</h4>
+        <dl class="kv">
+          <dt>Character</dt><dd>Modern "little Canada" park opened July 2022, built in under six months and quickly a marquee German destination known for authentic Canadian-style, hand-built flow and jump lines for all levels. <sup class="ref"><a href="#p3-s2">[2]</a></sup></dd>
+          <dt>Trail types</dt><dd>Flow, jump lines, freeride/tech, whip-off line, beginner flow (Moose Cruise) <sup class="ref"><a href="#p3-s1">[1]</a></sup><sup class="ref"><a href="#p3-s2">[2]</a></sup></dd>
+          <dt>Difficulty spread</dt><dd>11 trails plus variations spanning beginner to demanding; an explicit green/blue/red/black count per trail is <span class="nf">Not found</span> on official/independent sources <sup class="ref"><a href="#p3-s1">[1]</a></sup><sup class="ref"><a href="#p3-s2">[2]</a></sup></dd>
+          <dt>Total trails</dt><dd>11 professionally built trails (+ variations) <sup class="ref"><a href="#p3-s2">[2]</a></sup></dd>
+          <dt>Vertical drop</dt><dd>~200 m <sup class="ref"><a href="#p3-s2">[2]</a></sup></dd>
+          <dt>Longest descent</dt><dd><span class="nf">Not found</span></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Features &amp; suitability</h4>
+        <dl class="kv">
+          <dt>Family friendliness</dt><dd>Beginner-friendly easyLOOP tow + green Moose Cruise; kids' rental bikes (VPACE) available <sup class="ref"><a href="#p3-s1">[1]</a></sup><sup class="ref"><a href="#p3-s6">[6]</a></sup></dd>
+          <dt>Beginner-friendliness</dt><dd>Green flow line (Moose Cruise) + valley practice course; some steep-angle experience helpful <sup class="ref"><a href="#p3-s1">[1]</a></sup><sup class="ref"><a href="#p3-s6">[6]</a></sup></dd>
+          <dt>Skills area</dt><dd>Yes — practice course in the valley. <span class="pill no">Not a belt/magic-carpet</span>; access is via the easyLOOP <em>tow</em> lift, not a conveyor carpet <sup class="ref"><a href="#p3-s1">[1]</a></sup></dd>
+          <dt>Standout features</dt><dd>Canadian-style hand-built jumps; BYND whip-off line; hosted Swatch Nines MTB 2023 <sup class="ref"><a href="#p3-s2">[2]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Practical</h4>
+        <dl class="kv">
+          <dt>Bike shop / repair</dt><dd>Free tools for minor repairs at top &amp; bottom stations; rental (ROSE DH, PIVOT enduro, VPACE kids) + POC protection <sup class="ref"><a href="#p3-s1">[1]</a></sup></dd>
+          <dt>Bike wash</dt><dd><span class="pill yes">Yes</span> — multiple wash stations in upper car park (water runs ~2 h after lift close) <sup class="ref"><a href="#p3-s1">[1]</a></sup></dd>
+          <dt>Camper / camping</dt><dd>Limited campervan spaces in lower car park (no reservations, no electricity); 24 h sanitary facilities with €2 coin showers <sup class="ref"><a href="#p3-s1">[1]</a></sup></dd>
+          <dt>Reputation</dt><dd>Strongly reviewed since 2022; MTB-News praises many well-built trails and "absolutely fair, below-average" pricing for the region <sup class="ref"><a href="#p3-s2">[2]</a></sup></dd>
+        </dl>
+      </div>
+
+      <details class="sources">
+        <summary>Sources</summary>
+        <div class="sources">
+          <ol>
+            <li id="p3-s1"><a href="https://greenhill-bikepark.de/?lang=en" target="_blank" rel="noopener">Green Hill Bikepark — official site (lifts, hours, facilities, Gravity Card status, camping)</a></li>
+            <li id="p3-s2"><a href="https://www.mtb-news.de/news/greenhill-bikepark-klein-kanada-im-sauerland/" target="_blank" rel="noopener">MTB-News — "Klein-Kanada im Sauerland" review (trails, vertical, reputation)</a></li>
+            <li id="p3-s3"><a href="https://www.bike-arena.de/de/mountainbike/bikeparks-und-trailcenter/green-hill-bikepark-gellinghausen" target="_blank" rel="noopener">Bike Arena Sauerland — Green Hill profile</a></li>
+            <li id="p3-s4"><a href="https://maps.googleapis.com/maps/api/geocode/json?address=Green+Hill+Bikepark,+Gellinghausen,+Schmallenberg,+Germany" target="_blank" rel="noopener">Google Geocoding API — address &amp; coordinates</a></li>
+            <li id="p3-s5"><a href="https://maps.googleapis.com/maps/api/directions/json?origin=Oskar-Helene-Park+7,+14195+Berlin&destination=51.2352539,8.3568745" target="_blank" rel="noopener">Google Directions API — Berlin → Green Hill (480 km / 5 h 17 min)</a></li>
+            <li id="p3-s6"><a href="https://www.bavarian-bike.de/pages/bikepark-greenhill-mountainbike-paradies-im-sauerland" target="_blank" rel="noopener">Bavarian-Bike — Green Hill overview (easyLOOP system, beginner notes)</a></li>
+          </ol>
+        </div>
+      </details>
+    </details>
+
+    <!-- ===================== PARK 4: GEISSKOPF ===================== -->
+    <details class="park" open>
+      <summary><span class="pk-title">4. Bikepark Geißkopf (MTB Zone)</span> &nbsp;<span class="pk-region">Bischofsmais, Bavaria (Bayerischer Wald), Germany</span></summary>
+
+      <div class="grp">
+        <h4>Access &amp; logistics</h4>
+        <dl class="kv">
+          <dt>Country</dt><dd>Germany</dd>
+          <dt>Region</dt><dd>Bischofsmais, Bayerischer Wald, Bavaria <sup class="ref"><a href="#p4-s4">[4]</a></sup></dd>
+          <dt>Address</dt><dd>Unterbreitenau 1, 94253 Bischofsmais <sup class="ref"><a href="#p4-s4">[4]</a></sup></dd>
+          <dt>Coordinates</dt><dd>48.9341, 13.0423 <sup class="ref"><a href="#p4-s4">[4]</a></sup></dd>
+          <dt>Drive from Berlin</dt><dd>542 km &middot; ~5 h 50 min (Google Directions from Oskar-Helene-Park 7, 14195 Berlin) <sup class="ref"><a href="#p4-s5">[5]</a></sup></dd>
+          <dt>Lift type</dt><dd>Chairlift ("Sessellift") + a faster drag lift ("Schlepper"); a new modern lift added in 2021 <sup class="ref"><a href="#p4-s2">[2]</a></sup><sup class="ref"><a href="#p4-s3">[3]</a></sup></dd>
+          <dt>Uplift capacity</dt><dd><span class="nf">Not found</span></dd>
+          <dt>Season &amp; hours</dt><dd>~May–Nov; open Wed–Sun + holidays/school breaks; lift 09:00–16:45 (last up 16:30) <sup class="ref"><a href="#p4-s6">[6]</a></sup></dd>
+          <dt>Gravity Card</dt><dd><span class="pill yes">Yes</span> — Gravity Card sold/accepted at the park <sup class="ref"><a href="#p4-s1">[1]</a></sup><sup class="ref"><a href="#p4-s3">[3]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Trails</h4>
+        <dl class="kv">
+          <dt>Character</dt><dd>One of Europe's most diverse parks for 25+ years (Diddie Schneider), pairing a natural rocky DH with a very long, beginner-friendly Flow Country trail, north-shore, freeride and two enduro lines. <sup class="ref"><a href="#p4-s1">[1]</a></sup><sup class="ref"><a href="#p4-s2">[2]</a></sup></dd>
+          <dt>Trail types</dt><dd>Downhill, flow country, freeride (rooty), north-shore, biker-cross, two enduro lines, pump track <sup class="ref"><a href="#p4-s2">[2]</a></sup></dd>
+          <dt>Difficulty spread</dt><dd><span class="badges"><span class="badge b-green"><span class="dot"></span>2</span><span class="badge b-red"><span class="dot"></span>5</span><span class="badge b-black"><span class="dot"></span>2</span></span> (2 easy / 5 medium / 2 hard per directory; total ~13–15 runs) <sup class="ref"><a href="#p4-s3">[3]</a></sup></dd>
+          <dt>Total trails</dt><dd>~13–15 trails <sup class="ref"><a href="#p4-s2">[2]</a></sup><sup class="ref"><a href="#p4-s3">[3]</a></sup></dd>
+          <dt>Vertical drop</dt><dd>242 m <sup class="ref"><a href="#p4-s2">[2]</a></sup><sup class="ref"><a href="#p4-s3">[3]</a></sup></dd>
+          <dt>Longest descent</dt><dd>~2,200 m <sup class="ref"><a href="#p4-s3">[3]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Features &amp; suitability</h4>
+        <dl class="kv">
+          <dt>Family friendliness</dt><dd>Described as an enjoyable family park with well-maintained tracks and "chicken ways" on most trails <sup class="ref"><a href="#p4-s3">[3]</a></sup></dd>
+          <dt>Beginner-friendliness</dt><dd>Easy Flow Country trail (no technical sections) + kids' course + practice course <sup class="ref"><a href="#p4-s1">[1]</a></sup></dd>
+          <dt>Skills area</dt><dd>Yes — Übungsparcours with small jumps, waves, curves and drops, plus a kids' course. <span class="pill no">Not a belt/magic-carpet</span>; uplift is a chairlift + drag lift, no conveyor reported <sup class="ref"><a href="#p4-s1">[1]</a></sup></dd>
+          <dt>Standout features</dt><dd>Two distinct Evil Eye trails; natural rocky DH; long Flow Country trail <sup class="ref"><a href="#p4-s2">[2]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Practical</h4>
+        <dl class="kv">
+          <dt>Bike shop / repair</dt><dd>On-site workshop + rental; MTB Zone shop <sup class="ref"><a href="#p4-s3">[3]</a></sup></dd>
+          <dt>Bike wash</dt><dd><span class="pill yes">Yes</span> — bike wash on site <sup class="ref"><a href="#p4-s3">[3]</a></sup></dd>
+          <dt>Camper / camping</dt><dd>Camping with electrical hook-ups available; showers/restrooms on site <sup class="ref"><a href="#p4-s3">[3]</a></sup></dd>
+          <dt>Reputation</dt><dd>Long-standing favourite; reviewers praise variety &amp; grooming, note the older chairlift can be slow (newer drag lift compensates) <sup class="ref"><a href="#p4-s3">[3]</a></sup></dd>
+        </dl>
+      </div>
+
+      <details class="sources">
+        <summary>Sources</summary>
+        <div class="sources">
+          <ol>
+            <li id="p4-s1"><a href="https://mtbzone-bikepark.com/geisskopf" target="_blank" rel="noopener">MTB Zone Bikepark Geisskopf — official site (trails, kids/practice course, Gravity Card)</a></li>
+            <li id="p4-s2"><a href="https://www.sehenswerter-bayerischer-wald.de/bikepark-geisskopf-bischofsmais-mtb-zone.html" target="_blank" rel="noopener">Bikepark Geisskopf overview (trail mix, lifts, vertical)</a></li>
+            <li id="p4-s3"><a href="https://www.bikepark-online.de/bikeparks/deutschland/bikepark-bischofsmais-geisskopf/" target="_blank" rel="noopener">Bikepark-online.de — Geisskopf profile (vertical 242 m, longest 2,200 m, difficulty split, camping, Gravity Card)</a></li>
+            <li id="p4-s4"><a href="https://maps.googleapis.com/maps/api/geocode/json?address=Bikepark+Geisskopf,+Bischofsmais,+Germany" target="_blank" rel="noopener">Google Geocoding API — address &amp; coordinates</a></li>
+            <li id="p4-s5"><a href="https://maps.googleapis.com/maps/api/directions/json?origin=Oskar-Helene-Park+7,+14195+Berlin&destination=48.9341233,13.0422722" target="_blank" rel="noopener">Google Directions API — Berlin → Geisskopf (542 km / 5 h 50 min)</a></li>
+            <li id="p4-s6"><a href="https://mtbzone-bikepark.com/geisskopf/oeffnungszeiten" target="_blank" rel="noopener">MTB Zone — Geisskopf opening hours &amp; season</a></li>
+          </ol>
+        </div>
+      </details>
+    </details>
+
+    <!-- ===================== PARK 5: KLINOVEC ===================== -->
+    <details class="park" open>
+      <summary><span class="pk-title">5. Trail Park Klínovec</span> &nbsp;<span class="pk-region">Klínovec / Boží Dar, Karlovy Vary region, Czech Republic</span></summary>
+
+      <div class="grp">
+        <h4>Access &amp; logistics</h4>
+        <dl class="kv">
+          <dt>Country</dt><dd>Czech Republic (Ore Mountains / Krušné hory, on the German border)</dd>
+          <dt>Region</dt><dd>Klínovec, near Boží Dar / Loučná pod Klínovcem, Karlovy Vary region <sup class="ref"><a href="#p5-s2">[2]</a></sup><sup class="ref"><a href="#p5-s4">[4]</a></sup></dd>
+          <dt>Address</dt><dd>Bratrství 1065, 362 51 Jáchymov (operator address) <sup class="ref"><a href="#p5-s5">[5]</a></sup></dd>
+          <dt>Coordinates</dt><dd>50.4080, 12.9268 (Boží Dar area) <sup class="ref"><a href="#p5-s4">[4]</a></sup></dd>
+          <dt>Drive from Berlin</dt><dd>329 km &middot; ~3 h 44 min (Google Directions from Oskar-Helene-Park 7, 14195 Berlin) <sup class="ref"><a href="#p5-s6">[6]</a></sup></dd>
+          <dt>Lift type</dt><dd>4-seat chairlift with bubble cover (Express A) <sup class="ref"><a href="#p5-s5">[5]</a></sup><sup class="ref"><a href="#p5-s3">[3]</a></sup></dd>
+          <dt>Uplift capacity</dt><dd><span class="nf">Not found</span> (stated only as 4-seat bubble chairlift)</dd>
+          <dt>Season &amp; hours</dt><dd>May–early Nov; daily 09:30–18:00 in Jul–Aug, weekends/holidays in shoulder months; earlier close in late Oct <sup class="ref"><a href="#p5-s3">[3]</a></sup></dd>
+          <dt>Gravity Card</dt><dd><span class="pill yes">Yes</span> — part of the Gravity Card network since the 2024 season <sup class="ref"><a href="#p5-s5">[5]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Trails</h4>
+        <dl class="kv">
+          <dt>Character</dt><dd>Speed-focused trail network famous for some of Europe's longest continuous flow descents, plus a 30-year-tradition downhill race track — right on the German border. <sup class="ref"><a href="#p5-s1">[1]</a></sup><sup class="ref"><a href="#p5-s2">[2]</a></sup></dd>
+          <dt>Trail types</dt><dd>Long flow/single-trail descents, downhill pro-line, enduro, jumps, pump track <sup class="ref"><a href="#p5-s5">[5]</a></sup></dd>
+          <dt>Difficulty spread</dt><dd><span class="badges"><span class="badge b-blue"><span class="dot"></span>1</span><span class="badge b-red"><span class="dot"></span>1</span><span class="badge b-black"><span class="dot"></span>1</span></span> + 2 "orange" expert/difficult lines (Downhill, Illegal); marketed as 5 difficulty levels <sup class="ref"><a href="#p5-s1">[1]</a></sup><sup class="ref"><a href="#p5-s7">[7]</a></sup></dd>
+          <dt>Total trails</dt><dd>5 main signed trails within 30+ km of single-trails (≈35 km total) <sup class="ref"><a href="#p5-s1">[1]</a></sup><sup class="ref"><a href="#p5-s2">[2]</a></sup></dd>
+          <dt>Vertical drop</dt><dd>Chairlift gains ~500 m vertical; longest single trail descends ~387 m (Trailforks) <sup class="ref"><a href="#p5-s7">[7]</a></sup></dd>
+          <dt>Longest descent</dt><dd>Azur ~10 km, Rubin ~8 km, Baron ~6 km; downhill ~3 km <sup class="ref"><a href="#p5-s1">[1]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Features &amp; suitability</h4>
+        <dl class="kv">
+          <dt>Family friendliness</dt><dd>Free entry for children age 5 and under; long gentle Azur flow trail suits families/novices <sup class="ref"><a href="#p5-s2">[2]</a></sup><sup class="ref"><a href="#p5-s1">[1]</a></sup></dd>
+          <dt>Beginner-friendliness</dt><dd>Blue "Azur" entry flow trail (~10 km) is an easy, gently descending intro <sup class="ref"><a href="#p5-s1">[1]</a></sup></dd>
+          <dt>Skills area</dt><dd>Yes — Skillcentrum + pump track at the summit by the chairlift exit. <span class="pill no">Not a belt/magic-carpet</span>; uplift is the chairlift, no conveyor reported <sup class="ref"><a href="#p5-s1">[1]</a></sup></dd>
+          <dt>Standout features</dt><dd>Azur/Rubin/Baron among the longest continuous descents in Europe; "world-class" 3 km DH race track; expert "Illegal" line <sup class="ref"><a href="#p5-s1">[1]</a></sup><sup class="ref"><a href="#p5-s2">[2]</a></sup></dd>
+        </dl>
+      </div>
+
+      <div class="grp">
+        <h4>Practical</h4>
+        <dl class="kv">
+          <dt>Bike shop / repair</dt><dd>Bike rental + repair shop on site <sup class="ref"><a href="#p5-s2">[2]</a></sup></dd>
+          <dt>Bike wash</dt><dd><span class="pill yes">Yes</span> — bike wash on site <sup class="ref"><a href="#p5-s2">[2]</a></sup></dd>
+          <dt>Camper / camping</dt><dd>Motor-home parking at the area; partner accommodation nearby <sup class="ref"><a href="#p5-s5">[5]</a></sup><sup class="ref"><a href="#p5-s2">[2]</a></sup></dd>
+          <dt>Reputation</dt><dd>Widely rated a top Czech destination for speed and marathon flow trails; "Czech enduro paradise" <sup class="ref"><a href="#p5-s8">[8]</a></sup></dd>
+        </dl>
+      </div>
+
+      <details class="sources">
+        <summary>Sources</summary>
+        <div class="sources">
+          <ol>
+            <li id="p5-s1"><a href="https://www.trailpark.cz/en/trails-and-sections/" target="_blank" rel="noopener">Trail Park Klínovec — official trails &amp; sections (colours, lengths, skillcentrum, pump track)</a></li>
+            <li id="p5-s2"><a href="https://www.karlovyvary.cz/en/trail-park-klinovec" target="_blank" rel="noopener">Karlovy Vary tourism — Trail Park Klínovec (30 km trails, lift, facilities, families)</a></li>
+            <li id="p5-s3"><a href="https://www.trailpark.cz/en/hours-of-operation/" target="_blank" rel="noopener">Trail Park Klínovec — hours of operation &amp; season (lift type)</a></li>
+            <li id="p5-s4"><a href="https://maps.googleapis.com/maps/api/geocode/json?address=Klinovec,+Bozi+Dar,+Czech+Republic" target="_blank" rel="noopener">Google Geocoding API — coordinates</a></li>
+            <li id="p5-s5"><a href="https://www.gravity-card.com/bikeparks/trailpark-klinovec/?lang=en" target="_blank" rel="noopener">Gravity Card — Klínovec membership (since 2024), lift, motor-home parking</a></li>
+            <li id="p5-s6"><a href="https://maps.googleapis.com/maps/api/directions/json?origin=Oskar-Helene-Park+7,+14195+Berlin&destination=50.4080278,12.9268147" target="_blank" rel="noopener">Google Directions API — Berlin → Klínovec (329 km / 3 h 44 min)</a></li>
+            <li id="p5-s7"><a href="https://www.trailforks.com/region/trail-park-klinovec/" target="_blank" rel="noopener">Trailforks — Trail Park Klínovec (descent metrics)</a></li>
+            <li id="p5-s8"><a href="https://43ride.com/en/story/2024/trail-park-klinovec/" target="_blank" rel="noopener">43RIDE — "Trail Park Klínovec, Czech enduro paradise" (reputation)</a></li>
+          </ol>
+        </div>
+      </details>
+    </details>
+
+  </details>
+
+  <footer>
+    Compiled by the bikepark-researcher agent. Facts are sourced as of the dates noted;
+    verify season &amp; pricing on the operator's site before travel.
+  </footer>
+</div>
+
+<script>
+  // Park pins are injected by the agent. Each: {name, region, lat, lng}
+  window.BIKEPARK_PINS = [
+    {name:"Bikepark Willingen", region:"Willingen (Upland), Germany", lat:51.2895974, lng:8.5934781},
+    {name:"Bikepark Winterberg", region:"Winterberg, Germany", lat:51.185196, lng:8.504557},
+    {name:"Green Hill Bikepark", region:"Schmallenberg, Germany", lat:51.2352539, lng:8.3568745},
+    {name:"Bikepark Geißkopf", region:"Bischofsmais, Germany", lat:48.9341233, lng:13.0422722},
+    {name:"Trail Park Klínovec", region:"Boží Dar, Czech Republic", lat:50.4080278, lng:12.9268147}
+  ];
+  function initBikeparkMap(){
+    var el = document.getElementById('map');
+    if(!el) return;
+    if(!(window.google && google.maps)){
+      el.outerHTML = '<div class="map-fallback">Map could not load &mdash; the Google Maps '
+        + 'API key is missing or restricted for this context.</div>';
+      return;
+    }
+    var pins = (window.BIKEPARK_PINS||[]).filter(function(p){return p.lat!=null && p.lng!=null;});
+    if(pins.length===0){
+      el.outerHTML = '<div class="map-fallback">No mappable coordinates were found for the '
+        + 'parks in this report.</div>';
+      return;
+    }
+    var map = new google.maps.Map(el, {mapTypeId:'terrain', mapTypeControl:true, streetViewControl:false});
+    var bounds = new google.maps.LatLngBounds();
+    pins.forEach(function(p){
+      var m = new google.maps.Marker({position:{lat:p.lat, lng:p.lng}, map:map, title:p.name});
+      var iw = new google.maps.InfoWindow({content:'<strong>'+p.name+'</strong>'+(p.region?('<br>'+p.region):'')});
+      m.addListener('click', function(){ iw.open({anchor:m, map:map}); });
+      bounds.extend(m.getPosition());
+    });
+    map.fitBounds(bounds);
+    if(pins.length===1){
+      google.maps.event.addListenerOnce(map, 'idle', function(){ map.setZoom(11); });
+    }
+  }
+  // Fallback if the Maps script never loads (missing/blocked key).
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      if(!(window.google && google.maps)) initBikeparkMap();
+    }, 2500);
+  });
+</script>
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6py6TbAeiHSLbzPT_v5S3HueI5sH1TgE&callback=initBikeparkMap"></script>
+</body>
+</html>
