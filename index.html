@@ -4,25 +4,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bikepark Research Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d212b; --line:#2a2f3a;
-    --txt:#e8eaed; --muted:#9aa3b2; --accent:#34d399; --accent2:#60a5fa;
-    --green:#22c55e; --blue:#3b82f6; --red:#ef4444; --black:#111827;
-    --warn:#f59e0b; --radius:14px;
-  }
-  @media (prefers-color-scheme: light){
-    :root{ --bg:#f4f6f9; --card:#ffffff; --card2:#f0f3f7; --line:#e2e6ec;
-           --txt:#161a20; --muted:#5b6472; --black:#1f2937; }
+    --bg:#f9f9f9; --card:#ffffff; --card2:#f1f1f1; --line:#dddddd; --line2:#cccccc;
+    --txt:#222222; --muted:#666666; --faint:#999999; --ink:#1c1c1c;
+    --bar:#222222; --bar2:#444444;
+    --sand:#d7ca9e; --sand-dark:#a6925a;
+    --accent:#d7ca9e; --accent2:#444444;
+    --green:#008827; --blue:#0070d2; --red:#cc0000; --black:#1c1c1c;
+    --warn:#cc0000; --radius:3px;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--txt);
-    font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:1100px;margin:0 auto;padding:32px 20px 80px}
-  header.report{margin-bottom:28px}
-  header.report h1{font-size:30px;margin:0 0 6px;letter-spacing:-.02em}
-  .meta{color:var(--muted);font-size:14px}
-  .meta b{color:var(--txt)}
+    font:16px/1.55 'Roboto',-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  h1,h2,h3,h4,h5,h6{font-family:'Roboto Condensed','Roboto',sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 20px 80px}
+  /* hero header - charcoal bar with sand rule (COMMENCAL nav style) */
+  header.report{background:var(--bar);color:#fff;padding:26px 28px;border-radius:var(--radius);
+    border-bottom:4px solid var(--sand);margin:0 0 26px}
+  header.report h1{font-weight:700;text-transform:uppercase;letter-spacing:.01em;
+    font-size:34px;line-height:1.04;margin:0 0 8px;color:#fff}
+  .meta{color:#c7c7c7;font-size:13px}
+  .meta b{color:#fff}
   /* collapsible sections */
   details.sec{margin:30px 0 0}
   details.sec>summary, details.park>summary{
@@ -32,62 +39,69 @@
     content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
     transform:rotate(-45deg);transition:transform .15s ease;flex:none}
   details[open].sec>summary::before, details[open].park>summary::before{transform:rotate(45deg)}
-  h2.section{font-size:22px;margin:0;padding-bottom:8px}
-  details.sec>summary{border-bottom:1px solid var(--line);padding-bottom:8px;margin:18px 0 14px}
+  h2.section{font-weight:700;text-transform:uppercase;letter-spacing:.03em;font-size:22px;margin:0;color:var(--ink)}
+  details.sec>summary{border-bottom:2px solid var(--ink);padding-bottom:8px;margin:34px 0 16px}
   details.sec>summary h2.section{border:none;padding-bottom:0}
   /* map */
-  #map{height:440px;width:100%;border:1px solid var(--line);border-radius:var(--radius);background:var(--card2)}
-  .map-fallback{padding:18px;border:1px dashed var(--line);border-radius:var(--radius);
+  #map{height:440px;width:100%;border:1px solid var(--line2);border-radius:var(--radius);background:var(--card2)}
+  .map-fallback{padding:18px;border:1px dashed var(--line2);border-radius:var(--radius);
     color:var(--muted);font-size:14px}
-  /* Overview table */
-  .overview{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius)}
+  /* overview table - charcoal header, COMMENCAL spec-table style */
+  .overview{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--card)}
   table{border-collapse:collapse;width:100%;font-size:14px}
-  th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-  th{background:var(--card2);font-weight:600;white-space:nowrap}
+  th,td{padding:11px 12px;text-align:left;vertical-align:top}
+  th{background:var(--bar);color:#fff;font-family:'Roboto Condensed','Roboto',sans-serif;font-weight:700;
+    text-transform:uppercase;letter-spacing:.04em;font-size:12.5px;white-space:nowrap}
+  td{border-bottom:1px solid var(--line)}
+  tbody tr:nth-child(even){background:#fafafa}
   tr:last-child td{border-bottom:none}
-  td a{color:var(--accent2)}
-  /* Park cards */
-  .park{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    padding:18px 24px;margin:22px 0}
+  td a{color:var(--bar2);text-decoration:underline}
+  td a:hover{color:var(--sand-dark)}
+  /* park cards - sand left accent */
+  .park{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--sand);
+    border-radius:var(--radius);padding:18px 24px;margin:22px 0}
   details.park>summary{margin:0}
-  details.park[open]>summary{margin-bottom:8px}
-  details.park>summary .pk-title{font-size:22px;font-weight:600}
+  details.park[open]>summary{margin-bottom:10px}
+  details.park>summary .pk-title{font-family:'Roboto Condensed','Roboto',sans-serif;font-weight:700;
+    text-transform:uppercase;letter-spacing:.02em;font-size:23px;color:var(--ink)}
   details.park>summary .pk-region{color:var(--muted);font-size:14px;font-weight:400}
   /* collapsible subsection cards within a park */
-  details.grp{margin:14px 0;background:var(--card2);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  details.grp{margin:14px 0;background:var(--card2);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
   details.grp>summary{list-style:none;cursor:pointer;user-select:none;display:flex;align-items:center;gap:10px;padding:12px 16px}
   details.grp>summary::-webkit-details-marker{display:none}
   details.grp>summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s ease;flex:none}
   details[open].grp>summary::before{transform:rotate(45deg)}
   details.grp[open]>summary{border-bottom:1px solid var(--line)}
-  details.grp h4{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0}
+  details.grp h4{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);margin:0;font-weight:700}
   details.grp .kv{padding:14px 16px 16px}
-  .kv{display:grid;grid-template-columns:210px 1fr;gap:6px 18px}
-  .kv dt{color:var(--muted)}
+  .kv{display:grid;grid-template-columns:210px 1fr;gap:7px 18px}
+  .kv dt{color:var(--muted);font-weight:500}
   .kv dd{margin:0}
   @media (max-width:620px){.kv{grid-template-columns:1fr}.kv dt{margin-top:8px}}
-  /* difficulty badges */
+  /* difficulty badges - squared, COMMENCAL functional colors */
   .badges{display:inline-flex;gap:6px;flex-wrap:wrap}
-  .badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:999px;
-    font-size:12px;font-weight:600;color:#fff}
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:2px;
+    font-size:12px;font-weight:700;color:#fff}
   .badge .dot{width:8px;height:8px;border-radius:50%;background:#fff}
   .b-green{background:var(--green)} .b-blue{background:var(--blue)}
   .b-red{background:var(--red)} .b-black{background:var(--black)}
   /* source links + flags */
-  .src{font-size:12px;color:var(--accent2);text-decoration:none;white-space:nowrap}
-  .src:hover{text-decoration:underline}
-  sup.ref a{color:var(--accent2);text-decoration:none;font-weight:600}
-  .nf{color:var(--warn);font-style:italic}
-  .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600;
-    border:1px solid var(--line)}
-  .pill.yes{color:var(--green);border-color:var(--green)}
-  .pill.no{color:var(--muted)}
-  .pill.belt{color:var(--accent2);border-color:var(--accent2)}
-  details.sources{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);font-size:13px}
-  details.sources>summary{cursor:pointer;color:var(--muted);font-weight:600;user-select:none}
-  .sources ol{margin:6px 0 0;padding-left:20px}
-  .sources a{color:var(--accent2);word-break:break-all}
-  footer{margin-top:50px;color:var(--muted);font-size:12px;text-align:center}
+  .src{font-size:12px;color:var(--bar2);text-decoration:none;white-space:nowrap}
+  .src:hover{text-decoration:underline;color:var(--sand-dark)}
+  sup.ref a{color:var(--bar2);text-decoration:none;font-weight:700}
+  .nf{color:var(--red);font-style:italic}
+  /* pills - solid COMMENCAL blocks */
+  .pill{display:inline-block;padding:2px 9px;border-radius:2px;font-size:11px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.03em;border:1px solid var(--line2)}
+  .pill.yes{color:#fff;background:var(--green);border-color:var(--green)}
+  .pill.no{color:var(--muted);background:#ececec;border-color:var(--line2)}
+  .pill.belt{color:#3a3320;background:var(--sand);border-color:var(--sand)}
+  details.sources{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line2);font-size:13px}
+  details.sources>summary{cursor:pointer;color:var(--muted);font-weight:700;text-transform:uppercase;
+    letter-spacing:.04em;font-size:12px;user-select:none}
+  .sources ol{margin:8px 0 0;padding-left:20px}
+  .sources a{color:var(--bar2);word-break:break-all}
+  footer{margin-top:50px;padding-top:18px;border-top:2px solid var(--ink);color:var(--muted);font-size:12px;text-align:center}
 </style>
 </head>
 <body>
