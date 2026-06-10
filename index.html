@@ -540,6 +540,20 @@
   ];
   // Home origin for the Berlin drive times (Oskar-Helene-Park 7, 14195 Berlin).
   window.BIKEPARK_HOME = {name:"Home - Oskar-Helene-Park 7, 14195 Berlin", lat:52.4628, lng:13.2607};
+  // Google Maps calls this if the key / HTTP-referrer / API restriction rejects this page.
+  window.gm_authFailure = function(){
+    var el = document.getElementById('map');
+    if(!el) return;
+    var ref = location.origin + '/*';
+    el.outerHTML = '<div class="map-fallback"><strong>Google Maps could not authenticate this page.</strong><br>'
+      + 'The embed key was rejected for this domain (<code>' + location.origin + '</code>). '
+      + 'In Google Cloud Console &rarr; APIs &amp; Services &rarr; Credentials, open this key and confirm:'
+      + '<ul style="margin:8px 0 0;padding-left:18px">'
+      + '<li><b>Application restrictions &rarr; Websites</b> includes <code>' + ref + '</code></li>'
+      + '<li><b>API restrictions</b> includes <b>Maps JavaScript API</b> (or is set to &ldquo;Don&rsquo;t restrict key&rdquo;)</li>'
+      + '<li>The <b>Maps JavaScript API</b> is enabled and billing is active on the project</li>'
+      + '</ul></div>';
+  };
   function initBikeparkMap(){
     var el = document.getElementById('map');
     if(!el) return;
