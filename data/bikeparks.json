@@ -1,6 +1,6 @@
 {
   "generated_date": "",
-  "park_count": 33,
+  "park_count": 34,
   "home": {
     "name": "Home - Oskar-Helene-Park 7, 14195 Berlin",
     "lat": 52.4628,
@@ -5972,6 +5972,218 @@
           "n": 6,
           "url": "https://maps.googleapis.com/maps/api/geocode/json?address=Bike+District+Val+di+Fassa+Canazei+Trentino+Italy",
           "title": "Google Maps Geocoding API &mdash; coordinates"
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "name": "BikePark a FunPark Kopřivná",
+      "region_label": "Malá Morávka, Moravian-Silesian Region, Czech Republic",
+      "coords": {
+        "lat": 50.0339243,
+        "lng": 17.3088128
+      },
+      "pin_name": "BikePark a FunPark Kopřivná",
+      "overview": {
+        "name": "BikePark a FunPark Kopřivná",
+        "cells": {
+          "location": "Malá Morávka, Moravian-Silesian Region, Czech Republic &middot; Hrubý Jeseník (Jeseníky Mountains), below Praděd",
+          "drive": "482 km<br>5:47 h <a class=\"src\" href=\"https://maps.googleapis.com/maps/api/directions/json?origin=Oskar-Helene-Park+7,+14195+Berlin&destination=50.0339243,17.3088128&mode=driving\" target=\"_blank\" rel=\"noopener\">↗ Google Maps Directions API</a>",
+          "lift": "Six-seat chairlift (with bike carriers) <sup class=\"ref\"><a href=\"#p34-s1\">[1]</a></sup>",
+          "gravity_card": "<span class=\"pill no\">No</span>",
+          "difficulty": "<span class=\"badges\"><span class=\"badge b-green\"><span class=\"dot\"></span>3</span><span class=\"badge b-blue\"><span class=\"dot\"></span>2</span><span class=\"badge b-red\"><span class=\"dot\"></span>1</span></span>",
+          "vertical": "200 m",
+          "skills": "<span class=\"pill yes\">Yes (no belt)</span>",
+          "rating": "<span class=\"nf\">Not found</span>",
+          "best_for": "Families &amp; progression"
+        },
+        "sort": {
+          "drive_km": 482,
+          "gravity_card": 0,
+          "difficulty": 6,
+          "vertical_m": 200,
+          "skills": 1,
+          "rating": null
+        }
+      },
+      "groups": [
+        {
+          "title": "Access &amp; logistics",
+          "rows": [
+            {
+              "label": "Country",
+              "html": "Czech Republic <sup class=\"ref\"><a href=\"#p34-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "State / region",
+              "html": "Moravian-Silesian Region <sup class=\"ref\"><a href=\"#p34-s3\">[3]</a></sup>"
+            },
+            {
+              "label": "City / nearest town",
+              "html": "Malá Morávka <sup class=\"ref\"><a href=\"#p34-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Mountain area",
+              "html": "Hrubý Jeseník (Jeseníky Mountains), below Praděd &middot; Kopřivná resort <sup class=\"ref\"><a href=\"#p34-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Coordinates",
+              "html": "50.0339, 17.3088 <a class=\"src\" href=\"https://maps.googleapis.com/maps/api/geocode/json?address=Bikepark+Kop%C5%99ivn%C3%A1+Mal%C3%A1+Mor%C3%A1vka+Czech+Republic\" target=\"_blank\" rel=\"noopener\">↗ Google Maps Geocoding API</a>"
+            },
+            {
+              "label": "Drive from Berlin",
+              "html": "482 km &middot; 5:47 h (from Oskar-Helene-Park 7, 14195 Berlin) <a class=\"src\" href=\"https://maps.googleapis.com/maps/api/directions/json?origin=Oskar-Helene-Park+7,+14195+Berlin&destination=50.0339243,17.3088128&mode=driving\" target=\"_blank\" rel=\"noopener\">↗ Google Maps Directions API</a>"
+            },
+            {
+              "label": "Lift / uplift",
+              "html": "Modern six-seat chairlift fitted with unique bike carriers; ~30–40 min climbing trail also available as a hike-up alternative <sup class=\"ref\"><a href=\"#p34-s1\">[1]</a></sup><sup class=\"ref\"><a href=\"#p34-s3\">[3]</a></sup>. Uplift capacity: <span class=\"nf\">Not found</span>"
+            },
+            {
+              "label": "Season & opening",
+              "html": "Summer season; weekends only in spring/autumn, daily in the main summer-holiday period (operator states full daily operation approx. 26 Jun – 29 Aug 2026) <sup class=\"ref\"><a href=\"#p34-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Operating hours",
+              "html": "Fri 15:00–19:00, Sat 10:00–18:00, Sun 10:00–17:00 (chairlift 10:00–18:00; daily 10:00–18:00 in Jul–Aug) <sup class=\"ref\"><a href=\"#p34-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Gravity Card",
+              "html": "<span class=\"pill no\">No</span> — only Trail Park Klínovec and Bikepark Špičák represent the Czech Republic in the Gravity Card network; Kopřivná is not listed <sup class=\"ref\"><a href=\"#p34-s5\">[5]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Trails",
+          "rows": [
+            {
+              "label": "Character",
+              "html": "One of the Czech Republic's most popular bike parks (won a 2022 nationwide \"best Czech bikepark\" reader survey with &gt;25% of votes); a varied, well-maintained resort in the Jeseníky that caters from absolute beginners and families up to experienced downhill/freeride riders <sup class=\"ref\"><a href=\"#p34-s2\">[2]</a></sup><sup class=\"ref\"><a href=\"#p34-s6\">[6]</a></sup>"
+            },
+            {
+              "label": "Trail types",
+              "html": "Flow/family trails, freeride, gravity/flow line with wooden features, dirt-jump/gap line, and downhill (DH1/DH2). Named trails include FunTrail, Family 1 &amp; 2, Spicy Freeride, Gravity Line, DirtZilla/BabyZilla (gap/jump lines) and DH2 <sup class=\"ref\"><a href=\"#p34-s2\">[2]</a></sup><sup class=\"ref\"><a href=\"#p34-s7\">[7]</a></sup>"
+            },
+            {
+              "label": "Difficulty spread",
+              "html": "Operator: 9 trails of all difficulty levels, 17.5 km total <sup class=\"ref\"><a href=\"#p34-s2\">[2]</a></sup>. mtbczech's colour breakdown of the core trails lists ~3 easy / 2 medium / 1 difficult <sup class=\"ref\"><a href=\"#p34-s3\">[3]</a></sup>; the park is continually expanded, so an exact official green/blue/red/black count is <span class=\"nf\">Not found</span>"
+            },
+            {
+              "label": "Vertical drop",
+              "html": "200 m <sup class=\"ref\"><a href=\"#p34-s3\">[3]</a></sup>"
+            },
+            {
+              "label": "Longest descent",
+              "html": "FunTrail is the longest single line at ~3.2 km; total trail network 17.5 km <sup class=\"ref\"><a href=\"#p34-s7\">[7]</a></sup><sup class=\"ref\"><a href=\"#p34-s2\">[2]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Features &amp; suitability",
+          "rows": [
+            {
+              "label": "Family friendliness",
+              "html": "Very high — co-located FunPark with trampoline field, bouldering, inflatable castle, climbing walls and swings, plus easy Family trails and a bike school taking children from age 5 <sup class=\"ref\"><a href=\"#p34-s4\">[4]</a></sup><sup class=\"ref\"><a href=\"#p34-s8\">[8]</a></sup>"
+            },
+            {
+              "label": "Beginner friendliness",
+              "html": "High — explicitly suitable for complete beginners and timid riders; FunTrail (reinforced surface, small rollers/jumps) and gravel Family routes ease progression; bike school and rentals on site <sup class=\"ref\"><a href=\"#p34-s3\">[3]</a></sup><sup class=\"ref\"><a href=\"#p34-s9\">[9]</a></sup>"
+            },
+            {
+              "label": "Skills area",
+              "html": "<span class=\"pill yes\">Yes (no belt)</span> — a Skills Centre next to the rental/service centre for practising berms, rollers and first jumps (reviewers note upper- and lower-station skill areas) plus a wooden pumptrack; no magic-carpet/conveyor belt mentioned <sup class=\"ref\"><a href=\"#p34-s2\">[2]</a></sup><sup class=\"ref\"><a href=\"#p34-s7\">[7]</a></sup><sup class=\"ref\"><a href=\"#p34-s3\">[3]</a></sup>"
+            },
+            {
+              "label": "Standout features",
+              "html": "Wooden pumptrack; Gravity Line with wooden benches/bridges and built features; dirt-jump/gap lines with jumps up to ~8–10 m (with bypass options); FMX airbag (via ENDUROM z.s.); hosts the Czech Enduro Series and the Kopřivná Bike Festival <sup class=\"ref\"><a href=\"#p34-s3\">[3]</a></sup><sup class=\"ref\"><a href=\"#p34-s7\">[7]</a></sup><sup class=\"ref\"><a href=\"#p34-s2\">[2]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Practical",
+          "rows": [
+            {
+              "label": "Bike shop / repair",
+              "html": "On-site Rental &amp; Service Centre with bike rental (incl. NORCO bikes), bike service and a spare-parts shop <sup class=\"ref\"><a href=\"#p34-s2\">[2]</a></sup><sup class=\"ref\"><a href=\"#p34-s3\">[3]</a></sup>"
+            },
+            {
+              "label": "Bike wash",
+              "html": "<span class=\"nf\">Not found</span> (not stated on the operator site)"
+            },
+            {
+              "label": "Camper-van / camping",
+              "html": "On-site Kemp Kopřivná pod Pradědem below the slope — pitches for tents and spaces for caravans/motorhomes with electric hookups, 24/7 hot showers, WC, drinking water, wifi and Bistro breakfast <sup class=\"ref\"><a href=\"#p34-s10\">[10]</a></sup><sup class=\"ref\"><a href=\"#p34-s11\">[11]</a></sup>"
+            },
+            {
+              "label": "Accommodation",
+              "html": "Horský hotel Kopřivná, chalets and cottages on site, with restaurant and wellness <sup class=\"ref\"><a href=\"#p34-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Reputation / reviews",
+              "html": "Strongly positive — voted the best bike park in the Czech Republic in a 2022 reader survey (&gt;25% of votes); reviewers praise the varied, continually-improved trails, modern lift and facilities. On Tripadvisor the resort is ranked #3 of 6 attractions in Malá Morávka. A representative aggregate star rating (e.g. Google) was <span class=\"nf\">Not found</span> via accessible APIs <sup class=\"ref\"><a href=\"#p34-s6\">[6]</a></sup><sup class=\"ref\"><a href=\"#p34-s7\">[7]</a></sup><sup class=\"ref\"><a href=\"#p34-s12\">[12]</a></sup>"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "n": 1,
+          "title": "Resort Kopřivná — Bikepark (operator)",
+          "url": "https://www.koprivna.cz/en/bikepark/"
+        },
+        {
+          "n": 2,
+          "title": "Resort Kopřivná — Information about Bikepark Kopřivná (operator)",
+          "url": "https://www.koprivna.cz/en/bikepark/information-about-bikepark-koprivna/"
+        },
+        {
+          "n": 3,
+          "title": "MTB Czech — Bikepark Kopřivná (trails, difficulty, vertical, lift)",
+          "url": "https://www.mtbczech.cz/en/strediska/Bikepark-Koprivna"
+        },
+        {
+          "n": 4,
+          "title": "Resort Kopřivná — Bikepark opening hours & season (operator)",
+          "url": "https://www.koprivna.cz/en/bikepark/"
+        },
+        {
+          "n": 5,
+          "title": "Gravity Card — Czech Republic bikeparks (network list)",
+          "url": "https://www.gravity-card.com/portfolio_category/czech-republic/?lang=en"
+        },
+        {
+          "n": 6,
+          "title": "DoleKOP.com — \"Nejlepší bikepark v ČR\" 2022 reader survey result",
+          "url": "https://dolekop.com/clanek/9744-nejlepsi-bikepark-v-cr-jak-to-dopadlo"
+        },
+        {
+          "n": 7,
+          "title": "TopOnTrail — Test a Recenze: Bikepark Kopřivná (trails, jumps, skills, review)",
+          "url": "https://www.topontrail.cz/bikepark-koprivna"
+        },
+        {
+          "n": 8,
+          "title": "Resort Kopřivná — Funpark (operator)",
+          "url": "https://www.koprivna.cz/en/funpark/"
+        },
+        {
+          "n": 9,
+          "title": "Horydoly — Bikepark Kopřivná také pro začátečníky a bázlivé bikery",
+          "url": "https://www.horydoly.cz/cykliste/bikepark-koprivna-pro-bazlive-bikery.html"
+        },
+        {
+          "n": 10,
+          "title": "Resort Kopřivná — Campground / Kemp (operator)",
+          "url": "https://www.koprivna.cz/en/accommodation/campground/"
+        },
+        {
+          "n": 11,
+          "title": "CzechCamping.com — Kemp Kopřivná, Malá Morávka",
+          "url": "https://www.czechcamping.com/ostrava-region/bruntal/1691-kemp-koprivna-mala-moravka"
+        },
+        {
+          "n": 12,
+          "title": "Tripadvisor — Ski resort Kopřivná, Malá Morávka",
+          "url": "https://www.tripadvisor.com/Attraction_Review-g2547205-d12631711-Reviews-Ski_resort_Koprivna-Mala_Moravka_Moravian_Silesian_Region_Moravia.html"
         }
       ]
     }
