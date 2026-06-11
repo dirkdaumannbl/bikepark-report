@@ -59,17 +59,34 @@
   td a:hover{color:var(--sand-dark)}
   td:first-child a{font-weight:700;text-decoration:none}
   td:first-child a:hover{text-decoration:underline;color:var(--sand-dark)}
-  /* sortable + filterable overview */
-  table{min-width:1200px}
+  /* sortable + filterable overview — fit to page width, no horizontal scroll */
+  .overview table{font-size:13px}
+  .overview th, .overview td{padding:8px 9px}
+  .overview thead th{white-space:normal}        /* multi-word headers wrap instead of forcing width */
+  .overview td{overflow-wrap:anywhere}          /* long cell text wraps rather than widening the table */
   th.sortable{cursor:pointer;user-select:none}
   th.sortable::after{content:" \2195";opacity:.45;font-size:11px}
   th.sort-asc::after{content:" \25B2";opacity:1}
   th.sort-desc::after{content:" \25BC";opacity:1}
-  tr.filters th{background:#efece6;padding:6px 8px}
+  tr.filters th{background:#efece6;padding:5px 7px}
   tr.filters input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:6px;
     padding:4px 7px;font:inherit;font-size:12px;background:#fff;color:#222}
   tr.filters input::placeholder{color:#9a948c}
   .ov-empty{padding:14px 12px;color:var(--muted);font-style:italic}
+  /* responsive: progressively drop low-priority columns so the table never scrolls sideways.
+     Column order: 1 Park · 2 Location · 3 Drive · 4 Lift · 5 Gravity Card ·
+     6 Difficulty · 7 Vertical · 8 Skills · 9 Rating · 10 Best for */
+  @media (max-width:960px){            /* tablet / small laptop: hide Lift, Gravity Card, Skills */
+    .overview th:nth-child(4), .overview td:nth-child(4),
+    .overview th:nth-child(5), .overview td:nth-child(5),
+    .overview th:nth-child(8), .overview td:nth-child(8){display:none}
+  }
+  @media (max-width:620px){            /* phone: also hide Location and Best for (the long text columns) */
+    .overview th:nth-child(2), .overview td:nth-child(2),
+    .overview th:nth-child(10), .overview td:nth-child(10){display:none}
+    .overview table{font-size:12px}
+    .overview th, .overview td{padding:6px 6px}
+  }
   /* expand / collapse all controls */
   .park-tools{display:flex;gap:8px;margin:2px 0 16px}
   .tool{font-family:'Roboto Condensed','Roboto',sans-serif;text-transform:uppercase;letter-spacing:.04em;
@@ -587,7 +604,7 @@
           <tr>
             <td><a href="#p34">BikePark a FunPark Kopřivná</a></td>
             <td>Malá Morávka, Moravian-Silesian Region, Czech Republic &middot; Hrubý Jeseník (Jeseníky Mountains), below Praděd</td>
-            <td data-sort="482">482 km<br>5:47 h <a class="src" href="https://maps.googleapis.com/maps/api/directions/json?origin=Oskar-Helene-Park+7,+14195+Berlin&destination=50.0339243,17.3088128&mode=driving" target="_blank" rel="noopener">↗ Google Maps Directions API</a></td>
+            <td data-sort="482">482 km<br>5:47 h</td>
             <td>Six-seat chairlift (with bike carriers) <sup class="ref"><a href="#p34-s1">[1]</a></sup></td>
             <td data-sort="0"><span class="pill no">No</span></td>
             <td data-sort="6"><span class="badges"><span class="badge b-green"><span class="dot"></span>3</span><span class="badge b-blue"><span class="dot"></span>2</span><span class="badge b-red"><span class="dot"></span>1</span></span></td>

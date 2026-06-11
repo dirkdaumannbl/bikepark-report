@@ -38,6 +38,16 @@ OV_COLS = [
 ]
 
 
+# The overview Drive column shows just distance + time; the cited Google Maps Directions
+# source link lives in each park's detail "Drive from Berlin" row. Strip any source link
+# from the overview cell so the column stays narrow and consistent across all parks.
+DRIVE_SRC_RE = re.compile(r'\s*<a\b[^>]*class="src"[^>]*>.*?</a>', re.S)
+
+
+def compact_drive(cell):
+    return DRIVE_SRC_RE.sub("", cell).strip()
+
+
 def overview_rows(parks):
     out = []
     for p in parks:
@@ -46,6 +56,8 @@ def overview_rows(parks):
         tds = [f'<td><a href="#p{pid}">{ov["name"]}</a></td>']
         for key, sortkey in OV_COLS:
             cell = ov["cells"][key]
+            if key == "drive":
+                cell = compact_drive(cell)
             if sortkey is None:
                 tds.append(f"<td>{cell}</td>")
             else:
