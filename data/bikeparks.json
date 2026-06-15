@@ -1,6 +1,6 @@
 {
   "generated_date": "",
-  "park_count": 34,
+  "park_count": 40,
   "home": {
     "name": "Home - Oskar-Helene-Park 7, 14195 Berlin",
     "lat": 52.4628,
@@ -6184,6 +6184,1021 @@
           "n": 12,
           "title": "Tripadvisor — Ski resort Kopřivná, Malá Morávka",
           "url": "https://www.tripadvisor.com/Attraction_Review-g2547205-d12631711-Reviews-Ski_resort_Koprivna-Mala_Moravka_Moravian_Silesian_Region_Moravia.html"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "name": "Bikepark Braunlage (Wurmberg)",
+      "region_label": "Braunlage, Lower Saxony, Germany",
+      "coords": {
+        "lat": 51.74,
+        "lng": 10.6172
+      },
+      "pin_name": "Bikepark Braunlage",
+      "overview": {
+        "name": "Bikepark Braunlage (Wurmberg)",
+        "cells": {
+          "location": "Braunlage, Lower Saxony, Germany &middot; Harz (Wurmberg, 971 m)",
+          "drive": "248 km<br>2:43 h <a class=\"src\" href=\"https://www.rome2rio.com/s/Berlin/Braunlage\" target=\"_blank\" rel=\"noopener\">&#8599; rome2rio</a>",
+          "lift": "Gondola (6-person, 2.8 km &mdash; Northern Germany&rsquo;s longest)",
+          "gravity_card": "<span class=\"pill no\">No</span>",
+          "difficulty": "<span class=\"badges\"><span class=\"badge b-blue\"><span class=\"dot\"></span>2</span><span class=\"badge b-red\"><span class=\"dot\"></span>2</span></span>",
+          "vertical": "400 m",
+          "skills": "<span class=\"pill yes\">Yes (no belt)</span>",
+          "rating": "<a href=\"https://www.komoot.com/highlight/1230492\" target=\"_blank\" rel=\"noopener\">4.8/5</a>",
+          "best_for": "Enduro &amp; technical DH"
+        },
+        "sort": {
+          "drive_km": 248,
+          "gravity_card": 0,
+          "difficulty": 4,
+          "vertical_m": 400,
+          "skills": 1,
+          "rating": 4.8
+        }
+      },
+      "groups": [
+        {
+          "title": "Access &amp; logistics",
+          "rows": [
+            {
+              "label": "Country",
+              "html": "Germany <sup class=\"ref\"><a href=\"#p35-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "State / region",
+              "html": "Lower Saxony <sup class=\"ref\"><a href=\"#p35-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "City / nearest town",
+              "html": "Braunlage <sup class=\"ref\"><a href=\"#p35-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Mountain area",
+              "html": "Harz &middot; Wurmberg (971 m) <sup class=\"ref\"><a href=\"#p35-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Coordinates",
+              "html": "51.7400, 10.6172 <a class=\"src\" href=\"https://latitude.to/articles-by-country/de/germany/269504/wurmberg-gondola-lift\" target=\"_blank\" rel=\"noopener\">&#8599; latitude.to</a>"
+            },
+            {
+              "label": "Drive from Berlin",
+              "html": "248 km &middot; 2:43 h <a class=\"src\" href=\"https://www.rome2rio.com/s/Berlin/Braunlage\" target=\"_blank\" rel=\"noopener\">&#8599; rome2rio</a>"
+            },
+            {
+              "label": "Lift",
+              "html": "6-person gondola (Wurmbergseilbahn, 2.8 km &mdash; Northern Germany&rsquo;s longest cable car); intermediate station available <sup class=\"ref\"><a href=\"#p35-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Season &amp; hours",
+              "html": "Mid-June to early November; daily approx. 09:15&ndash;17:00 (last uphill ride 16:40) <sup class=\"ref\"><a href=\"#p35-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Gravity Card",
+              "html": "<span class=\"pill no\">No</span> &mdash; not in Gravity Card network <sup class=\"ref\"><a href=\"#p35-s3\">[3]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Trails",
+          "rows": [
+            {
+              "label": "Character",
+              "html": "Natural-feeling gravity park on the highest peak in Lower Saxony; four long trails with up to 4 km per descent and 400 m vertical; rough, technical character with chickenways to bypass hard sections. <sup class=\"ref\"><a href=\"#p35-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Trail types",
+              "html": "Freeride, enduro singletrail, downhill with wooden elements; chickenways throughout <sup class=\"ref\"><a href=\"#p35-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Difficulty spread",
+              "html": "<span class=\"badges\"><span class=\"badge b-blue\"><span class=\"dot\"></span>2</span><span class=\"badge b-red\"><span class=\"dot\"></span>2</span></span> &nbsp;4 trails: Freeride (red), Snakebite (yellow/intermediate), Evil Rock&rsquo;s (purple/hard), Enduro (white/hard) <sup class=\"ref\"><a href=\"#p35-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Vertical / longest",
+              "html": "400 m vertical (valley to 971 m summit); trails up to 4 km long; total network ~18 km <sup class=\"ref\"><a href=\"#p35-s4\">[4]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Features &amp; suitability",
+          "rows": [
+            {
+              "label": "Family friendly",
+              "html": "Moderately &mdash; chickenways allow bypassing difficult sections; separate practice area at base <sup class=\"ref\"><a href=\"#p35-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Beginner friendly",
+              "html": "Partial &mdash; an &Uuml;bungsparcours (practice course) with wooden elements and berms at the base station caters to newcomers; main trails are fairly demanding <sup class=\"ref\"><a href=\"#p35-s5\">[5]</a></sup>"
+            },
+            {
+              "label": "Skills area",
+              "html": "<span class=\"pill yes\">Yes (no belt)</span> &mdash; &Uuml;bungsparcours with wooden elements, banked curves and jumps at valley station; no magic-carpet found <sup class=\"ref\"><a href=\"#p35-s5\">[5]</a></sup>"
+            },
+            {
+              "label": "Standout features",
+              "html": "Northernmost 6-person gondola in Germany; Evil Rock&rsquo;s (highly technical boulder field); permanent race timing system; four trails down the full 400 m <sup class=\"ref\"><a href=\"#p35-s2\">[2]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Practical",
+          "rows": [
+            {
+              "label": "Bike shop / repair",
+              "html": "Repair workshop on site (Werkstatt confirmed) <sup class=\"ref\"><a href=\"#p35-s5\">[5]</a></sup>"
+            },
+            {
+              "label": "Bike wash",
+              "html": "<span class=\"nf\">Not found</span>"
+            },
+            {
+              "label": "Camper / camping",
+              "html": "Camping Braunlage (nearby, approx. 1 km); modern pitches with 16-amp hook-ups, Wi-Fi, bike wash &mdash; explicitly markets itself to bikepark visitors <sup class=\"ref\"><a href=\"#p35-s6\">[6]</a></sup>"
+            },
+            {
+              "label": "Reputation",
+              "html": "Highly regarded: Komoot 4.8/5 (182 ratings); trail variety and dramatic 400 m descent praised; Evil Rock&rsquo;s and Enduro trails noted as stand-out challenges in northern Germany. <sup class=\"ref\"><a href=\"#p35-s7\">[7]</a></sup>"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "n": 1,
+          "url": "https://wurmberg-seilbahn.de/bikepark.html",
+          "title": "Wurmbergseilbahn &mdash; Bikepark (operator, trails, lift, pricing)"
+        },
+        {
+          "n": 2,
+          "url": "https://wurmberg-seilbahn.de/bikepark-sommer.html",
+          "title": "Wurmbergseilbahn &mdash; Bikepark Sommer (season, hours, trail overview)"
+        },
+        {
+          "n": 3,
+          "url": "https://www.gravity-card.com/gravity-card-bikeparks/?lang=en",
+          "title": "Gravity Card &mdash; network bikeparks list (Braunlage not listed)"
+        },
+        {
+          "n": 4,
+          "url": "https://www.trail-addicts.com/en/bike-park-braunlage/",
+          "title": "Trail Addicts &mdash; Bike Park Braunlage (18 km network, 400 m vertical)"
+        },
+        {
+          "n": 5,
+          "url": "https://bikepark-life.com/bikeparks/deutschland/bikepark-braunlage/",
+          "title": "Bikepark Life &mdash; Bikepark Braunlage (&Uuml;bungsparcours, Werkstatt)"
+        },
+        {
+          "n": 6,
+          "url": "https://campingbraunlage.de/en/home-2/",
+          "title": "Camping Braunlage &mdash; official site (pitches, facilities, proximity to Bikepark)"
+        },
+        {
+          "n": 7,
+          "url": "https://www.komoot.com/highlight/1230492",
+          "title": "Komoot &mdash; Bikepark Braunlage highlight (4.8/5, 182 ratings)"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "name": "Bikepark Hahnenklee (Bocksberg)",
+      "region_label": "Hahnenklee, Goslar district, Lower Saxony, Germany",
+      "coords": {
+        "lat": 51.8569,
+        "lng": 10.3569
+      },
+      "pin_name": "Bikepark Hahnenklee",
+      "overview": {
+        "name": "Bikepark Hahnenklee (Bocksberg)",
+        "cells": {
+          "location": "Hahnenklee, Goslar district, Lower Saxony, Germany &middot; Harz (Bocksberg, 726 m)",
+          "drive": "~287 km<br>~2:50 h <a class=\"src\" href=\"https://www.travelmath.com/drive-distance/from/Berlin,+Germany/to/Goslar,+Germany\" target=\"_blank\" rel=\"noopener\">&#8599; Travelmath</a>",
+          "lift": "Chairlift (Sessellift, 2 bikes per chair)",
+          "gravity_card": "<span class=\"pill no\">No</span>",
+          "difficulty": "<span class=\"badges\"><span class=\"badge b-green\"><span class=\"dot\"></span>1</span><span class=\"badge b-blue\"><span class=\"dot\"></span>2</span><span class=\"badge b-red\"><span class=\"dot\"></span>2</span><span class=\"badge b-black\"><span class=\"dot\"></span>2</span></span>",
+          "vertical": "~170 m",
+          "skills": "<span class=\"pill yes\">Yes (no belt)</span>",
+          "rating": "<a href=\"https://www.tripadvisor.com/Attraction_Review-g1051808-d4945636-Reviews-Bikepark_Hahnenklee-Hahnenklee_Bockswiese_Goslar_Lower_Saxony.html\" target=\"_blank\" rel=\"noopener\">4.3/5</a>",
+          "best_for": "Varied DH &amp; natural roots"
+        },
+        "sort": {
+          "drive_km": 287,
+          "gravity_card": 0,
+          "difficulty": 7,
+          "vertical_m": 170,
+          "skills": 1,
+          "rating": 4.3
+        }
+      },
+      "groups": [
+        {
+          "title": "Access &amp; logistics",
+          "rows": [
+            {
+              "label": "Country",
+              "html": "Germany <sup class=\"ref\"><a href=\"#p36-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "State / region",
+              "html": "Lower Saxony (Goslar district) <sup class=\"ref\"><a href=\"#p36-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "City / nearest town",
+              "html": "Hahnenklee-Bockswiese (borough of Goslar) <sup class=\"ref\"><a href=\"#p36-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Mountain area",
+              "html": "Harz &middot; Bocksberg (726 m) <sup class=\"ref\"><a href=\"#p36-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Coordinates",
+              "html": "51.8569, 10.3569 <a class=\"src\" href=\"https://en.wikipedia.org/wiki/Bocksberg_(Harz)\" target=\"_blank\" rel=\"noopener\">&#8599; Wikipedia &mdash; Bocksberg (Harz)</a>"
+            },
+            {
+              "label": "Drive from Berlin",
+              "html": "~287 km &middot; ~2:50 h (Berlin to Goslar ~280 km / 2:31 h + ~10 km to Hahnenklee) <a class=\"src\" href=\"https://www.travelmath.com/drive-distance/from/Berlin,+Germany/to/Goslar,+Germany\" target=\"_blank\" rel=\"noopener\">&#8599; Travelmath</a>"
+            },
+            {
+              "label": "Lift",
+              "html": "Sessellift (chairlift) operated by ErlebnisBocksBerg; 2 bikes + 2 riders per chair; hours 09:30&ndash;17:30 <sup class=\"ref\"><a href=\"#p36-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Season &amp; hours",
+              "html": "Late March (Easter) to early November; daily 09:30&ndash;17:30 <sup class=\"ref\"><a href=\"#p36-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Gravity Card",
+              "html": "<span class=\"pill no\">No</span> &mdash; not listed in Gravity Card network <sup class=\"ref\"><a href=\"#p36-s3\">[3]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Trails",
+          "rows": [
+            {
+              "label": "Character",
+              "html": "Compact but varied gravity park on the Bocksberg; eight distinct trails from beginner flow to black DH race lines, with natural roots and technical sections throughout. <sup class=\"ref\"><a href=\"#p36-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Trail types",
+              "html": "Flowtrail, freeride, enduro/roots, jumpline, DH race track, singletrail <sup class=\"ref\"><a href=\"#p36-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Difficulty spread",
+              "html": "<span class=\"badges\"><span class=\"badge b-green\"><span class=\"dot\"></span>1</span><span class=\"badge b-blue\"><span class=\"dot\"></span>2</span><span class=\"badge b-red\"><span class=\"dot\"></span>2</span><span class=\"badge b-black\"><span class=\"dot\"></span>2</span></span> &nbsp;8 trails total: B&ouml;ckchen (blue singletrail), Sprungb&ouml;ckchen (blue/red mini jumpline), Wilder Drache (blue/red freeride), Bock auf Wurzeln (red roots), Sprungbock (red/black jumpline), Wilder Fuchs (black DH race), Wilder Keiler (black DH), Wilder Bock (black DH) <sup class=\"ref\"><a href=\"#p36-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Vertical / longest",
+              "html": "~170 m vertical from Bocksberg summit (726 m) <sup class=\"ref\"><a href=\"#p36-s4\">[4]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Features &amp; suitability",
+          "rows": [
+            {
+              "label": "Family friendly",
+              "html": "Yes &mdash; Flowtrail described as &ldquo;optimal practice track for a first bikepark visit&rdquo;; children&rsquo;s practice course at summit <sup class=\"ref\"><a href=\"#p36-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Beginner friendly",
+              "html": "Yes &mdash; adult practice course at base station; Flowtrail (green/A-line) and B&ouml;ckchen (blue) suitable for newcomers <sup class=\"ref\"><a href=\"#p36-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Skills area",
+              "html": "<span class=\"pill yes\">Yes (no belt)</span> &mdash; adult &Uuml;bungsparcours at base station and children&rsquo;s course at summit; no magic-carpet/conveyor found <sup class=\"ref\"><a href=\"#p36-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Standout features",
+              "html": "8 distinct trails for all levels; Bock auf Wurzeln (root-heavy enduro); three black DH lines including race track Wilder Fuchs <sup class=\"ref\"><a href=\"#p36-s1\">[1]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Practical",
+          "rows": [
+            {
+              "label": "Bike shop / repair",
+              "html": "Board &lsquo;n&rsquo; Bikes at base station: bike rental (MTB &amp; e-MTB) and gear sales; repair services <sup class=\"ref\"><a href=\"#p36-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Bike wash",
+              "html": "<span class=\"nf\">Not found</span>"
+            },
+            {
+              "label": "Camper / camping",
+              "html": "<span class=\"nf\">Not found</span> (no on-site Stellplatz confirmed; nearest campsite in Goslar ~15 km)"
+            },
+            {
+              "label": "Reputation",
+              "html": "Tripadvisor 4.3/5 (9 reviews), #1 of 3 activities in Hahnenklee; praised for clean trails and helpful staff; mixed notes on berm maintenance on some lines. <sup class=\"ref\"><a href=\"#p36-s5\">[5]</a></sup>"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "n": 1,
+          "url": "https://bikepark-hahnenklee.de/",
+          "title": "Bikepark Hahnenklee &mdash; official site (trails, lift, season, pricing)"
+        },
+        {
+          "n": 2,
+          "url": "https://www.erlebnisbocksberg.de/sommersaison/bikepark-bikeshop/",
+          "title": "ErlebnisBocksBerg &mdash; Bikepark &amp; Bikeshop (lift, Board&rsquo;n&rsquo;Bikes)"
+        },
+        {
+          "n": 3,
+          "url": "https://www.gravity-card.com/gravity-card-bikeparks/?lang=en",
+          "title": "Gravity Card &mdash; network bikeparks list (Hahnenklee not listed)"
+        },
+        {
+          "n": 4,
+          "url": "https://www.bikepark-online.de/bikeparks/deutschland/bikepark-hahnenklee/",
+          "title": "Bikepark-Online &mdash; Bikepark Hahnenklee (vertical ~170 m, difficulty spread, skills area)"
+        },
+        {
+          "n": 5,
+          "url": "https://www.tripadvisor.com/Attraction_Review-g1051808-d4945636-Reviews-Bikepark_Hahnenklee-Hahnenklee_Bockswiese_Goslar_Lower_Saxony.html",
+          "title": "Tripadvisor &mdash; Bikepark Hahnenklee reviews (4.3/5)"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "name": "RacePark Schulenberg",
+      "region_label": "Schulenberg im Oberharz, Lower Saxony, Germany",
+      "coords": {
+        "lat": 51.8409,
+        "lng": 10.4437
+      },
+      "pin_name": "RacePark Schulenberg",
+      "overview": {
+        "name": "RacePark Schulenberg",
+        "cells": {
+          "location": "Schulenberg im Oberharz, Lower Saxony, Germany &middot; Harz (Wiesenberg, 645 m)",
+          "drive": "~275 km<br>~3:01 h <a class=\"src\" href=\"https://www.rome2rio.com/de/s/Berlin/Schulenberg-im-Oberharz\" target=\"_blank\" rel=\"noopener\">&#8599; rome2rio</a>",
+          "lift": "Drag lift (Schlepplift)",
+          "gravity_card": "<span class=\"pill no\">No</span>",
+          "difficulty": "<span class=\"badges\"><span class=\"badge b-blue\"><span class=\"dot\"></span>2</span><span class=\"badge b-red\"><span class=\"dot\"></span>3</span><span class=\"badge b-black\"><span class=\"dot\"></span>2</span></span>",
+          "vertical": "165 m",
+          "skills": "<span class=\"pill yes\">Yes (no belt)</span>",
+          "rating": "<span class=\"nf\">Not found</span>",
+          "best_for": "Weekend DH &amp; freeride"
+        },
+        "sort": {
+          "drive_km": 275,
+          "gravity_card": 0,
+          "difficulty": 7,
+          "vertical_m": 165,
+          "skills": 1,
+          "rating": null
+        }
+      },
+      "groups": [
+        {
+          "title": "Access &amp; logistics",
+          "rows": [
+            {
+              "label": "Country",
+              "html": "Germany <sup class=\"ref\"><a href=\"#p37-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "State / region",
+              "html": "Lower Saxony (Goslar district / Oberharz) <sup class=\"ref\"><a href=\"#p37-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "City / nearest town",
+              "html": "Schulenberg im Oberharz <sup class=\"ref\"><a href=\"#p37-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Mountain area",
+              "html": "Harz &middot; Wiesenberg (645 m) <sup class=\"ref\"><a href=\"#p37-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Coordinates",
+              "html": "51.8409, 10.4437 <a class=\"src\" href=\"https://en.harzinfo.de/poi/racepark-schulenberg\" target=\"_blank\" rel=\"noopener\">&#8599; HarzInfo &mdash; Racepark Schulenberg</a>"
+            },
+            {
+              "label": "Drive from Berlin",
+              "html": "~275 km &middot; ~3:01 h <a class=\"src\" href=\"https://www.rome2rio.com/de/s/Berlin/Schulenberg-im-Oberharz\" target=\"_blank\" rel=\"noopener\">&#8599; rome2rio</a>"
+            },
+            {
+              "label": "Lift",
+              "html": "Schlepplift (drag lift with anchor bars); operates 10:00&ndash;18:00 on open days <sup class=\"ref\"><a href=\"#p37-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Season &amp; hours",
+              "html": "April to October; open Saturdays, Sundays and public holidays only; 10:00&ndash;18:00 <sup class=\"ref\"><a href=\"#p37-s3\">[3]</a></sup>"
+            },
+            {
+              "label": "Gravity Card",
+              "html": "<span class=\"pill no\">No</span> &mdash; not listed in Gravity Card network <sup class=\"ref\"><a href=\"#p37-s4\">[4]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Trails",
+          "rows": [
+            {
+              "label": "Character",
+              "html": "Intimate weekend-only gravity park in the Oberharz; six varied trails from bikercross to technical downhill, with a chill vibe centred around the lift kiosk. <sup class=\"ref\"><a href=\"#p37-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Trail types",
+              "html": "Flow trail (Down[c]hiller), freeride, bikercross (BX), downhill, slopestyle/dirt jump (Pro Jumpline), enduro singletrail (Hiddenshred) <sup class=\"ref\"><a href=\"#p37-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Difficulty spread",
+              "html": "<span class=\"badges\"><span class=\"badge b-blue\"><span class=\"dot\"></span>2</span><span class=\"badge b-red\"><span class=\"dot\"></span>3</span><span class=\"badge b-black\"><span class=\"dot\"></span>2</span></span> &nbsp;7 lines: Down[c]hiller (flow/blue), BX Bikercross (blue), Freeride (red), Naturslalom (red), Stempelstieg (red), Downhill (black), Hiddenshred (black) <sup class=\"ref\"><a href=\"#p37-s3\">[3]</a></sup>"
+            },
+            {
+              "label": "Vertical / longest",
+              "html": "165 m vertical; Flowtrail 1.8 km (longest in park) <sup class=\"ref\"><a href=\"#p37-s3\">[3]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Features &amp; suitability",
+          "rows": [
+            {
+              "label": "Family friendly",
+              "html": "Partial &mdash; BX and Naturslalom suit beginners; all obstacles have chickenways <sup class=\"ref\"><a href=\"#p37-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Beginner friendly",
+              "html": "Yes (limited) &mdash; two beginner-suitable trails and bike school (Bikeschule) on site <sup class=\"ref\"><a href=\"#p37-s3\">[3]</a></sup>"
+            },
+            {
+              "label": "Skills area",
+              "html": "<span class=\"pill yes\">Yes (no belt)</span> &mdash; &Uuml;bungsparcours and on-site Bikeschule; no magic-carpet found <sup class=\"ref\"><a href=\"#p37-s3\">[3]</a></sup>"
+            },
+            {
+              "label": "Standout features",
+              "html": "Pro Jumpline (dirt slopestyle); Hiddenshred enduro trail; BX Bikercross; permanent PROPAIN Rookies Cup event venue <sup class=\"ref\"><a href=\"#p37-s5\">[5]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Practical",
+          "rows": [
+            {
+              "label": "Bike shop / repair",
+              "html": "Werkstatt (workshop) listed on site <sup class=\"ref\"><a href=\"#p37-s3\">[3]</a></sup>"
+            },
+            {
+              "label": "Bike wash",
+              "html": "<span class=\"nf\">Not found</span>"
+            },
+            {
+              "label": "Camper / camping",
+              "html": "Wohnmobilstellplatz Schulenberg (motorhome parking nearby); campsite on Skialpinum grounds (no power/water hook-ups); Campingplatz Altenau ~10 km <sup class=\"ref\"><a href=\"#p37-s6\">[6]</a></sup>"
+            },
+            {
+              "label": "Reputation",
+              "html": "Positive community reception; described as &ldquo;the cosiest and most challenging bikepark in Harz&rdquo;; rated 3/5 on Bikepark-Online for trail variety/infrastructure. <sup class=\"ref\"><a href=\"#p37-s3\">[3]</a></sup>"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "n": 1,
+          "url": "https://www.oberharz.de/en/activities/cycling/racepark-schulenberg",
+          "title": "Oberharz.de &mdash; RacePark Schulenberg (trails, lift, overview)"
+        },
+        {
+          "n": 2,
+          "url": "https://www.racement.com/en/willkommen-in-schulenberg",
+          "title": "Racement.com &mdash; Welcome to Schulenberg (trails, character)"
+        },
+        {
+          "n": 3,
+          "url": "https://www.bikepark-online.de/bikeparks/deutschland/bikepark-schulenberg/",
+          "title": "Bikepark-Online &mdash; RacePark Schulenberg (vertical 165 m, difficulty, &Uuml;bungsparcours, hours, pricing)"
+        },
+        {
+          "n": 4,
+          "url": "https://www.gravity-card.com/gravity-card-bikeparks/?lang=en",
+          "title": "Gravity Card &mdash; network bikeparks list (Schulenberg not listed)"
+        },
+        {
+          "n": 5,
+          "url": "https://bikepark-life.com/bikeparks/deutschland/racepark-schulenberg/",
+          "title": "Bikepark Life &mdash; RacePark Schulenberg (Pro Jumpline, Hiddenshred, chickenways)"
+        },
+        {
+          "n": 6,
+          "url": "https://www.wohnmobil-atlas.de/wohnmobilstellplatz-schulenberg/",
+          "title": "Wohnmobil-Atlas &mdash; Wohnmobilstellplatz Schulenberg"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "name": "Bikepark St. Andreasberg (MSB X-Trail)",
+      "region_label": "St. Andreasberg, Goslar district, Lower Saxony, Germany",
+      "coords": {
+        "lat": 51.704,
+        "lng": 10.525
+      },
+      "pin_name": "MSB X-Trail St. Andreasberg",
+      "overview": {
+        "name": "Bikepark St. Andreasberg (MSB X-Trail)",
+        "cells": {
+          "location": "St. Andreasberg, Goslar district, Lower Saxony, Germany &middot; Harz (Matthias-Schmidt-Berg)",
+          "drive": "~261 km<br>~2:53 h <a class=\"src\" href=\"https://www.rome2rio.com/s/Berlin/Sankt-Andreasberg\" target=\"_blank\" rel=\"noopener\">&#8599; rome2rio</a>",
+          "lift": "2 chairlifts (Sessellift, Alberti-Lift)",
+          "gravity_card": "<span class=\"pill no\">No</span>",
+          "difficulty": "<span class=\"badges\"><span class=\"badge b-green\"><span class=\"dot\"></span>2</span><span class=\"badge b-blue\"><span class=\"dot\"></span>4</span><span class=\"badge b-red\"><span class=\"dot\"></span>2</span><span class=\"badge b-black\"><span class=\"dot\"></span>1</span></span>",
+          "vertical": "~200 m",
+          "skills": "<span class=\"pill yes\">Yes (no belt)</span>",
+          "rating": "<span class=\"nf\">Not found</span>",
+          "best_for": "Harz all-rounder &amp; progression"
+        },
+        "sort": {
+          "drive_km": 261,
+          "gravity_card": 0,
+          "difficulty": 9,
+          "vertical_m": 200,
+          "skills": 1,
+          "rating": null
+        }
+      },
+      "groups": [
+        {
+          "title": "Access &amp; logistics",
+          "rows": [
+            {
+              "label": "Country",
+              "html": "Germany <sup class=\"ref\"><a href=\"#p38-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "State / region",
+              "html": "Lower Saxony (Goslar district) <sup class=\"ref\"><a href=\"#p38-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "City / nearest town",
+              "html": "Sankt Andreasberg <sup class=\"ref\"><a href=\"#p38-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Mountain area",
+              "html": "Harz &middot; Matthias-Schmidt-Berg <sup class=\"ref\"><a href=\"#p38-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Coordinates",
+              "html": "51.7040, 10.5250 <a class=\"src\" href=\"https://latlong.info/germany/lower-saxony/sankt-andreasberg\" target=\"_blank\" rel=\"noopener\">&#8599; latlong.info &mdash; Sankt Andreasberg</a>"
+            },
+            {
+              "label": "Drive from Berlin",
+              "html": "~261 km &middot; ~2:53 h <a class=\"src\" href=\"https://www.rome2rio.com/s/Berlin/Sankt-Andreasberg\" target=\"_blank\" rel=\"noopener\">&#8599; rome2rio</a>"
+            },
+            {
+              "label": "Lift",
+              "html": "2 chairlifts (Sessellift); Alberti-Lift at the Matthias-Schmidt-Berg <sup class=\"ref\"><a href=\"#p38-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Season &amp; hours",
+              "html": "April to October; Wednesday&ndash;Sunday 09:15&ndash;17:15; closed Monday &amp; Tuesday <sup class=\"ref\"><a href=\"#p38-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Gravity Card",
+              "html": "<span class=\"pill no\">No</span> &mdash; not listed in Gravity Card network <sup class=\"ref\"><a href=\"#p38-s3\">[3]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Trails",
+          "rows": [
+            {
+              "label": "Character",
+              "html": "The largest bikepark in the Harz with nine trails across 12 km; serves all levels from a kids trail and flowtrails to technical downhill and super enduro lines through forest. <sup class=\"ref\"><a href=\"#p38-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Trail types",
+              "html": "Flowtrail, freeride, enduro, singletrail, downhill, kids trail, jumpline <sup class=\"ref\"><a href=\"#p38-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Difficulty spread",
+              "html": "<span class=\"badges\"><span class=\"badge b-green\"><span class=\"dot\"></span>2</span><span class=\"badge b-blue\"><span class=\"dot\"></span>4</span><span class=\"badge b-red\"><span class=\"dot\"></span>2</span><span class=\"badge b-black\"><span class=\"dot\"></span>1</span></span> &nbsp;9 trails total: Flowtrail (green, 2,300 m), Kids Trail Harz (green), Funride (blue, 1,900 m), Singletrail (blue, 2,000 m), Enduro Trail (blue), Jump Line (blue/red), Freeride (red, 1,100 m), Downhill Trail (red/black, 1,500 m), Super Enduro (black) <sup class=\"ref\"><a href=\"#p38-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Vertical / longest",
+              "html": "~200 m vertical; longest trail 3,500 m (Flowtrail); total 12 km of trails <sup class=\"ref\"><a href=\"#p38-s2\">[2]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Features &amp; suitability",
+          "rows": [
+            {
+              "label": "Family friendly",
+              "html": "Yes &mdash; Kids Trail Harz (ages 5&ndash;10, gentle curves and safe elements); family-friendly trails on left side of lift <sup class=\"ref\"><a href=\"#p38-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Beginner friendly",
+              "html": "Yes &mdash; Flowtrail and Kids Trail cater to beginners; MTB courses offered via Trailtech skills school <sup class=\"ref\"><a href=\"#p38-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Skills area",
+              "html": "<span class=\"pill yes\">Yes (no belt)</span> &mdash; Fahrtechnikschule (skills school) offered via Trailtech.de; Kids Trail also serves as progression area; no magic-carpet found <sup class=\"ref\"><a href=\"#p38-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Standout features",
+              "html": "9 trails spanning 12 km &mdash; largest bikepark in Harz; Super Enduro (black expert line); wooden elements, seesaws and jumps; e-MTB day tickets available <sup class=\"ref\"><a href=\"#p38-s1\">[1]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Practical",
+          "rows": [
+            {
+              "label": "Bike shop / repair",
+              "html": "Rent&rsquo;n&rsquo;Ride at base station: MTB &amp; e-MTB hire; on-site workshop for repairs and adjustments <sup class=\"ref\"><a href=\"#p38-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Bike wash",
+              "html": "<span class=\"pill yes\">Yes</span> &mdash; bike wash station on site <sup class=\"ref\"><a href=\"#p38-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Camper / camping",
+              "html": "Camping facilities available in the St. Andreasberg area; contact local tourist office (05582-8033) for RV options <sup class=\"ref\"><a href=\"#p38-s5\">[5]</a></sup>"
+            },
+            {
+              "label": "Reputation",
+              "html": "Consistently praised as top Harz bikepark destination; MTB-News community reports well-maintained trails and good beginner progression; rated 3.2/5 overall on Bikepark-Online. <sup class=\"ref\"><a href=\"#p38-s2\">[2]</a></sup>"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "n": 1,
+          "url": "https://mountainsquad.com/en/pages/bikepark-andreasberg",
+          "title": "Mountain Squad &mdash; Bikepark Andreasberg (trails, lift, Kids Trail, hours, rental)"
+        },
+        {
+          "n": 2,
+          "url": "https://www.bikepark-online.de/bikeparks/deutschland/bikepark-st-andreasberg-harz-msb-x-trail/",
+          "title": "Bikepark-Online &mdash; MSB X-Trail St. Andreasberg (200 m vertical, 12 km trails, difficulty, bike wash)"
+        },
+        {
+          "n": 3,
+          "url": "https://www.gravity-card.com/gravity-card-bikeparks/?lang=en",
+          "title": "Gravity Card &mdash; network bikeparks list (St. Andreasberg not listed)"
+        },
+        {
+          "n": 4,
+          "url": "https://www.trailtech.de/harz-trails/msb-x-trail-sankt-andreasberg",
+          "title": "TrailTech &mdash; MSB X-Trail Sankt Andreasberg (skills school, trail overview)"
+        },
+        {
+          "n": 5,
+          "url": "https://www.harz-bikepark.de/bikepark-st-andreasberg/",
+          "title": "Harz-Bikepark.de &mdash; Bikepark St. Andreasberg overview (facilities, camping reference)"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "name": "Bikepark Bodetal (Rosstrappendownhill)",
+      "region_label": "Thale, Saxony-Anhalt, Germany",
+      "coords": {
+        "lat": 51.7486,
+        "lng": 11.041
+      },
+      "pin_name": "Bikepark Bodetal Thale",
+      "overview": {
+        "name": "Bikepark Bodetal (Rosstrappendownhill)",
+        "cells": {
+          "location": "Thale, Saxony-Anhalt, Germany &middot; Harz (Rosstrappe, 403 m)",
+          "drive": "~225 km<br>~2:30 h <a class=\"src\" href=\"https://www.viamichelin.com/routes/results/berlin-10115-berlin-berlin-germany-to-thale-06502-harz-saxony_anhalt-germany\" target=\"_blank\" rel=\"noopener\">&#8599; ViaMichelin</a>",
+          "lift": "Chairlift (Sessellift zur Rosstrappe)",
+          "gravity_card": "<span class=\"pill no\">No</span>",
+          "difficulty": "<span class=\"badges\"><span class=\"badge b-blue\"><span class=\"dot\"></span>3</span><span class=\"badge b-red\"><span class=\"dot\"></span>1</span><span class=\"badge b-black\"><span class=\"dot\"></span>1</span></span>",
+          "vertical": "250 m",
+          "skills": "<span class=\"pill no\">No</span>",
+          "rating": "<a href=\"https://www.bikepark-online.de/bikeparks/deutschland/bikepark-bodetal/\" target=\"_blank\" rel=\"noopener\">2.2/5</a>",
+          "best_for": "DH event venue &amp; scenic Harz"
+        },
+        "sort": {
+          "drive_km": 225,
+          "gravity_card": 0,
+          "difficulty": 5,
+          "vertical_m": 250,
+          "skills": 0,
+          "rating": 2.2
+        }
+      },
+      "groups": [
+        {
+          "title": "Access &amp; logistics",
+          "rows": [
+            {
+              "label": "Country",
+              "html": "Germany <sup class=\"ref\"><a href=\"#p39-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "State / region",
+              "html": "Saxony-Anhalt <sup class=\"ref\"><a href=\"#p39-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "City / nearest town",
+              "html": "Thale (postal: Goetheweg 1, 06502 Thale) <sup class=\"ref\"><a href=\"#p39-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Mountain area",
+              "html": "Harz &middot; Rosstrappe (403 m granite crag above the Bodetal gorge) <sup class=\"ref\"><a href=\"#p39-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Coordinates",
+              "html": "51.7486, 11.0410 <a class=\"src\" href=\"https://latitude.to/map/de/germany/cities/thale\" target=\"_blank\" rel=\"noopener\">&#8599; latitude.to &mdash; Thale</a>"
+            },
+            {
+              "label": "Drive from Berlin",
+              "html": "~225 km &middot; ~2:30 h <a class=\"src\" href=\"https://www.viamichelin.com/routes/results/berlin-10115-berlin-berlin-germany-to-thale-06502-harz-saxony_anhalt-germany\" target=\"_blank\" rel=\"noopener\">&#8599; ViaMichelin</a>"
+            },
+            {
+              "label": "Lift",
+              "html": "Sessellift zur Rosstrappe (chairlift); bike transport ends 15 min before regular closing time <sup class=\"ref\"><a href=\"#p39-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Season &amp; hours",
+              "html": "Year-round (weather-dependent); summer (Easter&ndash;October) 09:30&ndash;18:00; winter (November&ndash;Easter) 10:00&ndash;16:30 <sup class=\"ref\"><a href=\"#p39-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Gravity Card",
+              "html": "<span class=\"pill no\">No</span> &mdash; not listed in Gravity Card network <sup class=\"ref\"><a href=\"#p39-s3\">[3]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Trails",
+          "rows": [
+            {
+              "label": "Character",
+              "html": "Scenic gravity park above the dramatic Bode gorge; six trails mix easy flow lines with the challenging Rosstrappendownhill race trail and the demanding Schwarze K&ouml;hlerliesel; has hosted German DH championships. <sup class=\"ref\"><a href=\"#p39-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Trail types",
+              "html": "Flowtrail, enduro, downhill race, DH technical <sup class=\"ref\"><a href=\"#p39-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Difficulty spread",
+              "html": "<span class=\"badges\"><span class=\"badge b-blue\"><span class=\"dot\"></span>3</span><span class=\"badge b-red\"><span class=\"dot\"></span>1</span><span class=\"badge b-black\"><span class=\"dot\"></span>1</span></span> &nbsp;6 trails: Harzer Roller (blue, 2,200 m), Bodopass (blue, 800 m), Felsenweg (blue connector, 100 m), Brunhildenritt (blue/red enduro, 3,300 m), Rosstrappendownhill (red, 2,000 m), Schwarze K&ouml;hlerliesel (black, 2,300 m) <sup class=\"ref\"><a href=\"#p39-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Vertical / longest",
+              "html": "250 m vertical; longest trail Brunhildenritt at 3,300 m; total ~7.6 km of trails <sup class=\"ref\"><a href=\"#p39-s4\">[4]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Features &amp; suitability",
+          "rows": [
+            {
+              "label": "Family friendly",
+              "html": "Yes &mdash; Harzer Roller and Bodopass are easy flow trails suitable for beginners and families <sup class=\"ref\"><a href=\"#p39-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Beginner friendly",
+              "html": "Yes &mdash; two blue easy flow trails (Harzer Roller, Bodopass); suitable for first-time bikepark visitors <sup class=\"ref\"><a href=\"#p39-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Skills area",
+              "html": "<span class=\"pill no\">No</span> &mdash; no dedicated skills area or Fahrtechnikschule listed <sup class=\"ref\"><a href=\"#p39-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Standout features",
+              "html": "Annual Rosstrappendownhill race (held since 2006); former German DH championship venue; spectacular Bodetal gorge scenery; Schwarze K&ouml;hlerliesel (black expert line) <sup class=\"ref\"><a href=\"#p39-s5\">[5]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Practical",
+          "rows": [
+            {
+              "label": "Bike shop / repair",
+              "html": "Bikeshop Bodetal GmbH (at Thale base): rental (MTB &amp; e-MTB), repairs; praised for fast turnaround and knowledgeable staff <sup class=\"ref\"><a href=\"#p39-s6\">[6]</a></sup>"
+            },
+            {
+              "label": "Bike wash",
+              "html": "<span class=\"pill yes\">Yes</span> &mdash; Bikewash on site <sup class=\"ref\"><a href=\"#p39-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Camper / camping",
+              "html": "Wohnmobilparkplatz &ldquo;Am Bodetal&rdquo; directly at the Rosstrappe chairlift (€5/night); Klostercamping Thale also nearby <sup class=\"ref\"><a href=\"#p39-s7\">[7]</a></sup>"
+            },
+            {
+              "label": "Reputation",
+              "html": "Google 4.5/5 (60 reviews); Bikepark-Online rates it 2.2/5 for trail variety/infrastructure; praised for scenic location and easy beginner trails; critics note limited trail count. <sup class=\"ref\"><a href=\"#p39-s4\">[4]</a></sup>"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "n": 1,
+          "url": "https://bikepark-bodetal.de/",
+          "title": "Bikepark Bodetal &mdash; official site (lift, season, hours, address)"
+        },
+        {
+          "n": 2,
+          "url": "https://bikepark-bodetal.de/streckenuebersicht",
+          "title": "Bikepark Bodetal &mdash; trail overview (names, difficulties, lengths)"
+        },
+        {
+          "n": 3,
+          "url": "https://www.gravity-card.com/gravity-card-bikeparks/?lang=en",
+          "title": "Gravity Card &mdash; network bikeparks list (Bodetal not listed)"
+        },
+        {
+          "n": 4,
+          "url": "https://www.bikepark-online.de/bikeparks/deutschland/bikepark-bodetal/",
+          "title": "Bikepark-Online &mdash; Bikepark Bodetal (250 m vertical, 7.6 km trails, bikewash, rating 2.2/5)"
+        },
+        {
+          "n": 5,
+          "url": "https://rosstrappendownhill.de/",
+          "title": "Rosstrappendownhill &mdash; official race event site (annual race since 2006)"
+        },
+        {
+          "n": 6,
+          "url": "https://bikeshop-bodetal.wheree.com/",
+          "title": "Bikeshop Bodetal &mdash; reviews (rental, repair, customer service)"
+        },
+        {
+          "n": 7,
+          "url": "https://information-harz.de/info_poi_236.html",
+          "title": "Harz Information &mdash; Wohnmobilparkplatz Am Bodetal, Thale (€5/night, at chairlift)"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "name": "Trailpark Harz",
+      "region_label": "Ilsenburg, Saxony-Anhalt, Germany",
+      "coords": {
+        "lat": 51.867,
+        "lng": 10.6782
+      },
+      "pin_name": "Trailpark Harz Ilsenburg",
+      "overview": {
+        "name": "Trailpark Harz",
+        "cells": {
+          "location": "Ilsenburg, Saxony-Anhalt, Germany &middot; Harz (Ilse valley &amp; Brocken foothills)",
+          "drive": "~235 km<br>~2:28 h <a class=\"src\" href=\"https://www.rome2rio.com/s/Berlin/Ilsenburg-Harz\" target=\"_blank\" rel=\"noopener\">&#8599; rome2rio</a>",
+          "lift": "No lift (self-pedal / hike-a-bike)",
+          "gravity_card": "<span class=\"pill no\">No</span>",
+          "difficulty": "<span class=\"badges\"><span class=\"badge b-blue\"><span class=\"dot\"></span>1</span><span class=\"badge b-red\"><span class=\"dot\"></span>3</span></span>",
+          "vertical": "310 m (Kammweg)",
+          "skills": "<span class=\"pill no\">No</span>",
+          "rating": "<span class=\"nf\">Not found</span>",
+          "best_for": "Natural enduro &amp; trail riding"
+        },
+        "sort": {
+          "drive_km": 235,
+          "gravity_card": 0,
+          "difficulty": 4,
+          "vertical_m": 310,
+          "skills": 0,
+          "rating": null
+        }
+      },
+      "groups": [
+        {
+          "title": "Access &amp; logistics",
+          "rows": [
+            {
+              "label": "Country",
+              "html": "Germany <sup class=\"ref\"><a href=\"#p40-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "State / region",
+              "html": "Saxony-Anhalt <sup class=\"ref\"><a href=\"#p40-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "City / nearest town",
+              "html": "Ilsenburg (Harz) <sup class=\"ref\"><a href=\"#p40-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Mountain area",
+              "html": "Harz &middot; Ilse valley and Brocken foothills (Harzlandhalle area) <sup class=\"ref\"><a href=\"#p40-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Coordinates",
+              "html": "51.8670, 10.6782 <a class=\"src\" href=\"https://latitude.to/map/de/germany/cities/ilsenburg\" target=\"_blank\" rel=\"noopener\">&#8599; latitude.to &mdash; Ilsenburg</a>"
+            },
+            {
+              "label": "Drive from Berlin",
+              "html": "~235 km &middot; ~2:28 h <a class=\"src\" href=\"https://www.rome2rio.com/s/Berlin/Ilsenburg-Harz\" target=\"_blank\" rel=\"noopener\">&#8599; rome2rio</a>"
+            },
+            {
+              "label": "Lift",
+              "html": "No mechanical lift &mdash; self-pedal or hike-a-bike required; trails accessed from Harzlandhalle parking or T&auml;nntal <sup class=\"ref\"><a href=\"#p40-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Season &amp; hours",
+              "html": "Open year-round; allowed 1 hour after sunrise until 1 hour before sunset; closed during snow, ice and storms <sup class=\"ref\"><a href=\"#p40-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Gravity Card",
+              "html": "<span class=\"pill no\">No</span> &mdash; free-to-ride trail park; not in Gravity Card network <sup class=\"ref\"><a href=\"#p40-s3\">[3]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Trails",
+          "rows": [
+            {
+              "label": "Character",
+              "html": "Entirely natural, volunteer-built trail network in the Harz National Park buffer zone; five technically demanding descents with over 1,200 m of cumulative vertical; free to ride with donations supporting Trailpark Harz e.V. <sup class=\"ref\"><a href=\"#p40-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Trail types",
+              "html": "Natural enduro singletrack, technical downhill; no jump lines or northshore structures <sup class=\"ref\"><a href=\"#p40-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Difficulty spread",
+              "html": "<span class=\"badges\"><span class=\"badge b-blue\"><span class=\"dot\"></span>1</span><span class=\"badge b-red\"><span class=\"dot\"></span>3</span></span> &nbsp;4 official trails: Waldbad Trail (blue, 674 m / 58 m drop), Kammweg (red, 2,380 m / 310 m drop), Wassertal (red, 1,600 m / 231 m drop), Jack the Ripper (red, 1,600 m / 227 m drop); total 9.8 km <sup class=\"ref\"><a href=\"#p40-s2\">[2]</a></sup>"
+            },
+            {
+              "label": "Vertical / longest",
+              "html": "310 m on the Kammweg; cumulative 1,205 m across all trails; longest descent: Kammweg at 2,380 m <sup class=\"ref\"><a href=\"#p40-s2\">[2]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Features &amp; suitability",
+          "rows": [
+            {
+              "label": "Family friendly",
+              "html": "Limited &mdash; Waldbad Trail is the only beginner-suitable trail; most trails are red/hard and not recommended for children or novices <sup class=\"ref\"><a href=\"#p40-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Beginner friendly",
+              "html": "No &mdash; Kammweg, Jack the Ripper and Wassertal all contain difficult passages; Waldbad Trail only is accessible to intermediates <sup class=\"ref\"><a href=\"#p40-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Skills area",
+              "html": "<span class=\"pill no\">No</span> &mdash; no dedicated skills area; the trails themselves are the riding area <sup class=\"ref\"><a href=\"#p40-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Standout features",
+              "html": "Entirely natural &amp; free-to-ride; Jack the Ripper and Wassertal rated among the best natural descents in northern Germany; located near the Harz National Park <sup class=\"ref\"><a href=\"#p40-s5\">[5]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Practical",
+          "rows": [
+            {
+              "label": "Bike shop / repair",
+              "html": "<span class=\"nf\">Not found</span> at the trailhead; nearest bike shops in Wernigerode (~10 km)"
+            },
+            {
+              "label": "Bike wash",
+              "html": "<span class=\"nf\">Not found</span>"
+            },
+            {
+              "label": "Camper / camping",
+              "html": "<span class=\"nf\">Not found</span> at trailhead; several campsites in the Ilsenburg/Wernigerode area"
+            },
+            {
+              "label": "Reputation",
+              "html": "Enthusiastically received on MTB-News and Pinkbike; community praises high-quality natural trail building; Jack the Ripper and Wassertal described as &ldquo;really good and fun&rdquo; by Pinkbike users; geared toward advanced riders. <sup class=\"ref\"><a href=\"#p40-s5\">[5]</a></sup>"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "n": 1,
+          "url": "https://mountainsquad.com/en/pages/trailpark-harz",
+          "title": "Mountain Squad &mdash; Trailpark Harz (5 trails, 9.8 km, no lift, free to ride, season)"
+        },
+        {
+          "n": 2,
+          "url": "https://www.ilsenburg-tourismus.de/erlebnisse/trailpark-harz.html",
+          "title": "Ilsenburg Tourism &mdash; Trailpark Harz (individual trail names, lengths, vertical drops, difficulty)"
+        },
+        {
+          "n": 3,
+          "url": "https://www.gravity-card.com/gravity-card-bikeparks/?lang=en",
+          "title": "Gravity Card &mdash; network bikeparks list (Trailpark Harz not listed)"
+        },
+        {
+          "n": 4,
+          "url": "https://www.mtb-news.de/forum/t/trailpark-harz-und-umgebung-ilsenburg.996362/",
+          "title": "MTB-News Forum &mdash; Trailpark Harz und Umgebung Ilsenburg (difficulty discussion, 2024)"
+        },
+        {
+          "n": 5,
+          "url": "https://www.pinkbike.com/directory/13746/trailpark-harz/",
+          "title": "Pinkbike Directory &mdash; Trailpark Harz e.V. (community reviews, trail quality)"
         }
       ]
     }
