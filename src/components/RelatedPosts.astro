@@ -1,0 +1,24 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+  heading?: string;
+}
+const { posts, heading = 'Related posts' } = Astro.props;
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+
+<section class="related">
+  <h2 class="section-h">{heading}</h2>
+  <ul class="post-list">
+    {posts.map((p) => (
+      <li class="post-card">
+        <a class="post-title" href={`/blog/${p.id}/`}>{p.data.title}</a>
+        <div class="post-meta">{fmt(p.data.date)}</div>
+        {p.data.description && <p>{p.data.description}</p>}
+      </li>
+    ))}
+  </ul>
+</section>

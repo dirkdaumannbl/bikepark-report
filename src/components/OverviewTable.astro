@@ -1,0 +1,184 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  parks: CollectionEntry<'parks'>[];
+}
+const { parks } = Astro.props;
+
+// Columns after the Park name cell: [cell key in overview.cells, sort key in overview.sort | null].
+const OV_COLS: [string, string | null][] = [
+  ['location', null],
+  ['drive', 'drive_km'],
+  ['lift', null],
+  ['gravity_card', 'gravity_card'],
+  ['difficulty', 'difficulty'],
+  ['vertical', 'vertical_m'],
+  ['skills', 'skills'],
+  ['rating', 'rating'],
+  ['best_for', null],
+];
+
+// Mirror build_report.py compact_drive(): the overview Drive cell shows distance/time only;
+// the cited source link lives in each park's detail "Drive from Berlin" row.
+const stripDriveSrc = (s: string) =>
+  s.replace(/\s*<a\b[^>]*class="src"[^>]*>.*?<\/a>/s, '').trim();
+
+// Precompute rows in the frontmatter (pure TS) so the template stays free of type casts.
+const rows = parks.map((entry) => {
+  const cells = entry.data.overview.cells as Record<string, string>;
+  const sort = entry.data.overview.sort as Record<string, number | null>;
+  const cols = OV_COLS.map(([key, sortKey]) => {
+    const cell = key === 'drive' ? stripDriveSrc(cells[key]) : cells[key];
+    const dataSort = sortKey ? (sort[sortKey] == null ? '' : String(sort[sortKey])) : null;
+    return { cell, dataSort };
+  });
+  return { slug: entry.id, nameHtml: entry.data.overview.name, cols };
+});
+---
+
+<div class="overview">
+  <table>
+    <thead>
+      <tr class="head">
+        <th class="sortable" data-col="0" data-type="text">Park</th>
+        <th class="sortable" data-col="1" data-type="text">Location</th>
+        <th class="sortable" data-col="2" data-type="num">Drive from Berlin</th>
+        <th class="sortable" data-col="3" data-type="text">Lift</th>
+        <th class="sortable" data-col="4" data-type="num">Gravity Card</th>
+        <th class="sortable" data-col="5" data-type="num">Difficulty spread</th>
+        <th class="sortable" data-col="6" data-type="num">Vertical</th>
+        <th class="sortable" data-col="7" data-type="num">Skills area</th>
+        <th class="sortable" data-col="8" data-type="num">Rating</th>
+        <th class="sortable" data-col="9" data-type="text">Best for</th>
+      </tr>
+      <tr class="filters">
+        <th><input data-col="0" placeholder="Filter…" aria-label="Filter Park" /></th>
+        <th><input data-col="1" placeholder="Filter…" aria-label="Filter Location" /></th>
+        <th><input data-col="2" placeholder="Filter…" aria-label="Filter Drive" /></th>
+        <th><input data-col="3" placeholder="Filter…" aria-label="Filter Lift" /></th>
+        <th><input data-col="4" placeholder="Filter…" aria-label="Filter Gravity Card" /></th>
+        <th><input data-col="5" placeholder="Filter…" aria-label="Filter Difficulty" /></th>
+        <th><input data-col="6" placeholder="Filter…" aria-label="Filter Vertical" /></th>
+        <th><input data-col="7" placeholder="Filter…" aria-label="Filter Skills area" /></th>
+        <th><input data-col="8" placeholder="Filter…" aria-label="Filter Rating" /></th>
+        <th><input data-col="9" placeholder="Filter…" aria-label="Filter Best for" /></th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr>
+            <td><a href={`/parks/${row.slug}/`} set:html={row.nameHtml} /></td>
+            {row.cols.map((c) =>
+              c.dataSort === null ? (
+                <td set:html={c.cell} />
+              ) : (
+                <td data-sort={c.dataSort} set:html={c.cell} />
+              )
+            )}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<script>
+  /* ---- overview table: click-to-sort + per-column filter (self-contained) ---- */
+  (function () {
+    var table = document.querySelector('.overview table');
+    if (!table || !table.tBodies[0]) return;
+    var tbody = table.tBodies[0];
+    var headRow = table.querySelector('thead tr.head');
+    var filterRow = table.querySelector('thead tr.filters');
+    var colCount = headRow ? headRow.cells.length : 10;
+
+    function dataRows() {
+      return Array.prototype.filter.call(tbody.rows, function (r) {
+        return r.className.indexOf('ov-empty-row') === -1;
+      });
+    }
+    function cellText(row, idx) {
+      var c = row.cells[idx];
+      return c ? (c.textContent || '').trim() : '';
+    }
+
+    /* ---- sorting ---- */
+    var sortCol = -1, sortDir = 1;
+    function numVal(row, idx) {
+      var c = row.cells[idx];
+      if (!c) return NaN;
+      var ds = c.getAttribute('data-sort');
+      return parseFloat(ds !== null && ds !== '' ? ds : c.textContent);
+    }
+    function sortBy(col, type) {
+      sortDir = sortCol === col ? -sortDir : 1;
+      sortCol = col;
+      var rows = dataRows();
+      rows.sort(function (a, b) {
+        var r;
+        if (type === 'num') {
+          var av = numVal(a, col), bv = numVal(b, col), an = isNaN(av), bn = isNaN(bv);
+          if (an && bn) r = 0;
+          else if (an) return 1; /* blanks/NaN always last */
+          else if (bn) return -1;
+          else r = av - bv;
+        } else {
+          r = cellText(a, col).toLowerCase().localeCompare(cellText(b, col).toLowerCase());
+        }
+        return r * sortDir;
+      });
+      rows.forEach(function (r) { tbody.appendChild(r); });
+      var empty = tbody.querySelector('.ov-empty-row');
+      if (empty) tbody.appendChild(empty);
+      Array.prototype.forEach.call(headRow.cells, function (th) {
+        th.className = th.className.replace(/\s*sort-(asc|desc)/g, '');
+      });
+      headRow.cells[col].className += sortDir === 1 ? ' sort-asc' : ' sort-desc';
+    }
+    if (headRow) {
+      Array.prototype.forEach.call(headRow.cells, function (th) {
+        if (th.className.indexOf('sortable') === -1) return;
+        th.addEventListener('click', function () {
+          sortBy(parseInt(th.getAttribute('data-col'), 10), th.getAttribute('data-type'));
+        });
+      });
+    }
+
+    /* ---- filtering ---- */
+    var emptyRow = null;
+    function ensureEmptyRow() {
+      if (emptyRow) return emptyRow;
+      emptyRow = document.createElement('tr');
+      emptyRow.className = 'ov-empty-row';
+      var td = document.createElement('td');
+      td.className = 'ov-empty';
+      td.colSpan = colCount;
+      td.textContent = 'No parks match the current filters.';
+      emptyRow.appendChild(td);
+      tbody.appendChild(emptyRow);
+      return emptyRow;
+    }
+    function applyFilters() {
+      var terms = [];
+      if (filterRow) {
+        Array.prototype.forEach.call(filterRow.querySelectorAll('input'), function (inp) {
+          var v = inp.value.trim().toLowerCase();
+          if (v) terms.push({ col: parseInt(inp.getAttribute('data-col'), 10), v: v });
+        });
+      }
+      var visible = 0;
+      dataRows().forEach(function (row) {
+        var show = true;
+        for (var i = 0; i < terms.length; i++) {
+          if (cellText(row, terms[i].col).toLowerCase().indexOf(terms[i].v) === -1) { show = false; break; }
+        }
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      ensureEmptyRow().style.display = visible === 0 ? '' : 'none';
+    }
+    if (filterRow) filterRow.addEventListener('input', applyFilters);
+  })();
+</script>

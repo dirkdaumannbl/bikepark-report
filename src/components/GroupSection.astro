@@ -1,0 +1,18 @@
+---
+interface Props {
+  group: { title: string; rows: { label: string; html: string }[] };
+}
+const { group } = Astro.props;
+---
+
+<details class="grp" open>
+  <summary><h4 set:html={group.title} /></summary>
+  <dl class="kv">
+    {group.rows.map((row) => (
+      <>
+        <dt set:html={row.label} />
+        <dd set:html={row.html} />
+      </>
+    ))}
+  </dl>
+</details>

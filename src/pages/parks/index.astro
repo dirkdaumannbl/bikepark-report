@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BikeparkMap from '../../components/BikeparkMap.astro';
+import OverviewTable from '../../components/OverviewTable.astro';
+import report from '../../../data/bikeparks.json';
+
+const parks = (await getCollection('parks')).sort((a, b) => a.data.parkNo - b.data.parkNo);
+
+const pins = parks
+  .map((p) => ({
+    name: p.data.pin_name ?? p.data.overview.name,
+    region: p.data.region_label,
+    lat: p.data.coords?.lat,
+    lng: p.data.coords?.lng,
+  }))
+  .filter((p): p is { name: string; region: string; lat: number; lng: number } =>
+    p.lat != null && p.lng != null
+  );
+
+const home = report.home;
+const generated = report.generated_date;
+---
+
+<BaseLayout
+  title="Parks"
+  description="Map and sortable comparison of gravity bike parks reachable from Berlin."
+>
+  <header class="page-hero">
+    <h1>Bike parks</h1>
+    <p class="lede">
+      <b>{parks.length}</b> parks · driving distances from Oskar-Helene-Park 7, 14195 Berlin{
+        generated ? ` · data ${generated}` : ''
+      }. Every value links to a source; unverified items are marked “Not found”.
+    </p>
+  </header>
+
+  <BikeparkMap pins={pins} home={home} />
+
+  <h2 class="section-h" style="margin-top:28px">Overview</h2>
+  <OverviewTable parks={parks} />
+</BaseLayout>
