@@ -1,0 +1,52 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { Image } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+const { post } = Astro.props;
+const fm = post.data;
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+// Resolve linked park references to { slug, name } for the back-links.
+const linked = await Promise.all(
+  (fm.parks ?? []).map(async (ref) => {
+    const e = await getEntry(ref);
+    return e ? { slug: e.id, name: e.data.overview.name } : null;
+  })
+);
+const parks = linked.filter((p): p is { slug: string; name: string } => p !== null);
+---
+
+<BaseLayout title={fm.title} description={fm.description}>
+  <article class="article-body">
+    <p class="crumb"><a href="/blog/">Blog</a></p>
+    <header class="page-hero">
+      <h1>{fm.title}</h1>
+      <div class="post-meta">
+        {fmt(fm.date)}
+        {fm.tags.length > 0 && ' · '}
+        {fm.tags.map((t) => <span class="tag">{t}</span>)}
+      </div>
+    </header>
+    {fm.cover && <Image class="hero-img" src={fm.cover} alt={fm.title} />}
+    <slot />
+    {parks.length > 0 && (
+      <section class="related">
+        <h2 class="section-h">Bikeparks in this post</h2>
+        <ul class="post-list">
+          {parks.map((p) => (
+            <li class="post-card">
+              <a class="post-title" href={`/parks/${p.slug}/`} set:html={p.name} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+    <a class="back-link" href="/blog/">&larr; All posts</a>
+  </article>
+</BaseLayout>

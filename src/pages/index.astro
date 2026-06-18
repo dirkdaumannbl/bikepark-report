@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const parks = await getCollection('parks');
+const posts = (await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+
+<BaseLayout description="A researched, fully-sourced guide to gravity bike parks reachable from Berlin.">
+  <header class="page-hero">
+    <h1>Gravity bike parks, researched</h1>
+    <p class="lede">
+      A fully-sourced comparison of <b>{parks.length}</b> downhill &amp; gravity bike parks
+      reachable by car from Berlin — driving times, lift type, difficulty spread, vertical drop,
+      skills areas and more. Open any park for the full breakdown, the map, or the sortable table.
+    </p>
+  </header>
+  <p><a class="btn" href="/parks/">Explore the parks &rarr;</a></p>
+
+  {posts.length > 0 && (
+    <section class="related" style="border-top:none;padding-top:0;margin-top:34px">
+      <h2 class="section-h">Latest from the blog</h2>
+      <ul class="post-list">
+        {posts.map((p) => (
+          <li class="post-card">
+            <a class="post-title" href={`/blog/${p.id}/`}>{p.data.title}</a>
+            <div class="post-meta">{fmt(p.data.date)}</div>
+            {p.data.description && <p>{p.data.description}</p>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</BaseLayout>

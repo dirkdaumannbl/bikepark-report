@@ -1,0 +1,19 @@
+---
+const path = Astro.url.pathname;
+const nav = [
+  { label: 'Home', href: '/' },
+  { label: 'Parks', href: '/parks/' },
+  { label: 'Blog', href: '/blog/' },
+  { label: 'About', href: '/about/' },
+];
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+
+<header class="site-nav">
+  <a class="brand" href="/">Bikepark Report</a>
+  <nav>
+    {nav.map((i) => (
+      <a href={i.href} aria-current={isActive(i.href) ? 'page' : undefined}>{i.label}</a>
+    ))}
+  </nav>
+</header>

@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+
+<BaseLayout title="Blog" description="Trip reports, notes, and deep-dives — often tied to a specific park.">
+  <header class="page-hero">
+    <h1>Blog</h1>
+    <p class="lede">Trip reports, notes, and deep-dives — often tied to a specific park.</p>
+  </header>
+
+  {posts.length === 0 ? (
+    <p>No posts yet.</p>
+  ) : (
+    <ul class="post-list">
+      {posts.map((p) => (
+        <li class="post-card">
+          <a class="post-title" href={`/blog/${p.id}/`}>{p.data.title}</a>
+          <div class="post-meta">
+            {fmt(p.data.date)}
+            {p.data.tags.length > 0 && ' · '}
+            {p.data.tags.map((t) => <span class="tag">{t}</span>)}
+          </div>
+          {p.data.description && <p>{p.data.description}</p>}
+        </li>
+      ))}
+    </ul>
+  )}
+</BaseLayout>

@@ -1,0 +1,95 @@
+---
+interface Pin {
+  name: string;
+  region?: string;
+  lat: number;
+  lng: number;
+}
+interface Props {
+  pins: Pin[];
+  home?: { name: string; lat: number; lng: number } | null;
+}
+const { pins, home = null } = Astro.props;
+const mapsKey = import.meta.env.PUBLIC_GOOGLE_MAPS_KEY;
+const mapData = JSON.stringify({ pins, home });
+---
+
+{mapsKey ? (
+  <>
+    <div id="map"></div>
+    <script type="application/json" id="bikepark-map-data" set:html={mapData}></script>
+    <script is:inline>
+      (function () {
+        var dataEl = document.getElementById('bikepark-map-data');
+        var DATA = dataEl ? JSON.parse(dataEl.textContent) : { pins: [], home: null };
+
+        // Google Maps calls this if the key / referrer / API restriction rejects the page.
+        window.gm_authFailure = function () {
+          var m = document.getElementById('map');
+          if (!m) return;
+          m.outerHTML =
+            '<div class="map-fallback"><strong>Google Maps could not authenticate this page.</strong><br>' +
+            'The embed key was rejected for this domain (<code>' + location.origin + '</code>). ' +
+            "Add this site's domain to the key's HTTP-referrer allowlist in Google Cloud Console " +
+            '(APIs &amp; Services &rarr; Credentials), and confirm the Maps JavaScript API is enabled.</div>';
+        };
+
+        function initBikeparkMap() {
+          var node = document.getElementById('map');
+          if (!node) return;
+          if (!(window.google && google.maps)) {
+            node.outerHTML =
+              '<div class="map-fallback">Map could not load &mdash; the Google Maps API key is ' +
+              'missing or restricted for this context.</div>';
+            return;
+          }
+          var pins = (DATA.pins || []).filter(function (p) { return p.lat != null && p.lng != null; });
+          if (pins.length === 0) {
+            node.outerHTML = '<div class="map-fallback">No mappable coordinates were found.</div>';
+            return;
+          }
+          var map = new google.maps.Map(node, { mapTypeId: 'terrain', mapTypeControl: true, streetViewControl: false });
+          var bounds = new google.maps.LatLngBounds();
+          pins.forEach(function (p) {
+            var mk = new google.maps.Marker({ position: { lat: p.lat, lng: p.lng }, map: map, title: p.name });
+            var iw = new google.maps.InfoWindow({
+              content: '<strong>' + p.name + '</strong>' + (p.region ? '<br>' + p.region : ''),
+            });
+            mk.addListener('click', function () { iw.open({ anchor: mk, map: map }); });
+            bounds.extend(mk.getPosition());
+          });
+          var home = DATA.home;
+          if (home && home.lat != null && home.lng != null) {
+            var hm = new google.maps.Marker({
+              position: { lat: home.lat, lng: home.lng }, map: map, title: home.name,
+              icon: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png', zIndex: 9999,
+            });
+            var hiw = new google.maps.InfoWindow({
+              content: '<strong>&#127968; Home</strong><br>Oskar-Helene-Park 7, 14195 Berlin',
+            });
+            hm.addListener('click', function () { hiw.open({ anchor: hm, map: map }); });
+            bounds.extend(hm.getPosition());
+          }
+          map.fitBounds(bounds, 48);
+          google.maps.event.addListenerOnce(map, 'idle', function () {
+            if (map.getZoom() > 12) map.setZoom(12);
+          });
+        }
+        window.initBikeparkMap = initBikeparkMap;
+
+        // Fallback if the Maps script never loads (blocked/missing).
+        window.addEventListener('load', function () {
+          setTimeout(function () {
+            if (!(window.google && google.maps)) initBikeparkMap();
+          }, 2500);
+        });
+      })();
+    </script>
+    <script is:inline async src={`https://maps.googleapis.com/maps/api/js?key=${mapsKey}&callback=initBikeparkMap`}></script>
+  </>
+) : (
+  <div class="map-fallback">
+    The interactive map needs a Google Maps browser key. Set <code>PUBLIC_GOOGLE_MAPS_KEY</code>
+    in a local <code>.env</code> and in Vercel's environment variables to enable it.
+  </div>
+)}

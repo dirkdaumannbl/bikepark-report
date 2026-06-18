@@ -1,0 +1,18 @@
+---
+interface Props {
+  parkNo: number;
+  sources: { n: number; url: string; title: string }[];
+}
+const { parkNo, sources } = Astro.props;
+---
+
+<details class="sources">
+  <summary>Sources</summary>
+  <ol>
+    {sources.map((s) => (
+      <li id={`p${parkNo}-s${s.n}`}>
+        <a href={s.url} target="_blank" rel="noopener" set:html={s.title} />
+      </li>
+    ))}
+  </ol>
+</details>
