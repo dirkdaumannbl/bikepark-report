@@ -72,7 +72,7 @@ const resultCount = rows.length;
 const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n));
 ---
 
-<section style="max-width:1280px;margin:0 auto;padding:48px 40px 64px">
+<section class="ov-section" style="max-width:1280px;margin:0 auto;padding:48px 40px 64px">
   <h1 class="ls-h1-page" style="font-size:42px;font-weight:800;letter-spacing:-1.2px;margin:0 0 8px">Browse bikeparks</h1>
   <p style="font-size:17px;color:#5d5a52;margin:0 0 24px">
     <span class="ov-result-count">{resultCount}</span> family-friendly parks. Sort or filter on any
@@ -132,7 +132,7 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
   </div>
 
   <div class="overview" style="overflow-x:auto;border-radius:16px;border:2.5px solid #1a1430;box-shadow:6px 6px 0 #1a1430;background:#fff">
-    <table style="border-collapse:collapse;width:100%;min-width:1180px;font-size:14px">
+    <table style="border-collapse:collapse;width:100%;min-width:0;font-size:13px">
       <thead>
         <tr class="head" style="background:#1a1430;color:#fff">
           <th class="sortable" data-col="0" data-type="text" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Park</th>
@@ -225,6 +225,37 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
     </table>
   </div>
 </section>
+
+<style>
+  /* Compact, fit-to-width: no forced min-width, tighter columns, wrapping, and
+     progressive column-hiding so the table never needs horizontal scroll. */
+  .overview table { min-width: 0; }
+  .overview th,
+  .overview td { padding: 8px 9px !important; white-space: normal !important; overflow-wrap: anywhere; }
+  .overview thead .head th { font-size: 11px !important; letter-spacing: .2px !important; line-height: 1.2; }
+  .overview .filters th { padding: 6px 7px !important; }
+  .overview .filters input { min-width: 0 !important; }
+  /* keep short numeric cells (they carry data-sort) on one line */
+  .overview tbody td[data-sort] { white-space: nowrap !important; }
+  .overview tbody td > div { max-width: none !important; }
+  /* drop lower-priority columns instead of scrolling.
+     cols: 1 Park · 2 Location · 3 Drive · 4 Lift · 5 Gravity Card · 6 Difficulty · 7 Vertical · 8 Skills · 9 Rating · 10 Best for */
+  @media (max-width: 1180px) {
+    .overview th:nth-child(8), .overview td:nth-child(8) { display: none; } /* Skills area */
+  }
+  @media (max-width: 1000px) {
+    .overview th:nth-child(4), .overview td:nth-child(4),
+    .overview th:nth-child(5), .overview td:nth-child(5) { display: none; } /* Lift, Gravity Card */
+  }
+  @media (max-width: 768px) {
+    .ov-section { padding-left: 16px !important; padding-right: 16px !important; }
+    .overview th:nth-child(2), .overview td:nth-child(2),
+    .overview th:nth-child(10), .overview td:nth-child(10) { display: none; } /* Location, Best for */
+  }
+  @media (max-width: 560px) {
+    .overview th:nth-child(6), .overview td:nth-child(6) { display: none; } /* Difficulty spread */
+  }
+</style>
 
 <script>
   /* ---- overview table: click-to-sort + per-column filter + chip filters ---- */
