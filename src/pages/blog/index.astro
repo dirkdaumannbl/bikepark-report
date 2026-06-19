@@ -1,34 +1,85 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { parkImage } from '../../lib/stockImages';
 
-const posts = (await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const posts = (await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
 const fmt = (d: Date) =>
   d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 ---
 
-<BaseLayout title="Blog" description="Trip reports, notes, and deep-dives — often tied to a specific park.">
-  <header class="page-hero">
-    <h1>Blog</h1>
-    <p class="lede">Trip reports, notes, and deep-dives — often tied to a specific park.</p>
-  </header>
+<BaseLayout
+  title="Blog"
+  description="Parent trail reports, conditions notes and deep-dives — often tied to a specific park."
+>
+  <section style="max-width:1100px;margin:0 auto;padding:48px 40px 64px">
+    <div
+      style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#d6391f;margin-bottom:10px"
+    >
+      Parent trail reports
+    </div>
+    <h1 style="font-size:42px;font-weight:800;letter-spacing:-1.2px;margin:0 0 12px;line-height:1.05">
+      The Blog
+    </h1>
+    <p style="font-size:16px;color:#5d5a52;margin:0 0 40px;max-width:640px">
+      Trip reports, conditions notes and deep-dives — often tied to a specific park.
+    </p>
 
-  {posts.length === 0 ? (
-    <p>No posts yet.</p>
-  ) : (
-    <ul class="post-list">
-      {posts.map((p) => (
-        <li class="post-card">
-          <a class="post-title" href={`/blog/${p.id}/`}>{p.data.title}</a>
-          <div class="post-meta">
-            {fmt(p.data.date)}
-            {p.data.tags.length > 0 && ' · '}
-            {p.data.tags.map((t) => <span class="tag">{t}</span>)}
-          </div>
-          {p.data.description && <p>{p.data.description}</p>}
-        </li>
-      ))}
-    </ul>
-  )}
+    {posts.length === 0 ? (
+      <p style="font-size:16px;color:#5d5a52">No posts yet — check back soon.</p>
+    ) : (
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px">
+        {posts.map((p) => {
+          const meta = [fmt(p.data.date), ...p.data.tags];
+          return (
+            <a
+              class="ls-card"
+              href={`/blog/${p.id}/`}
+              style="display:flex;flex-direction:column;background:#fff;border-radius:16px;overflow:hidden;text-decoration:none;color:#1a1430"
+            >
+              <div style="position:relative;height:180px;flex:none;border-bottom:2.5px solid #1a1430">
+                {p.data.cover ? (
+                  <Image
+                    src={p.data.cover}
+                    alt={p.data.title}
+                    style="width:100%;height:100%;object-fit:cover;display:block"
+                  />
+                ) : (
+                  <img
+                    src={parkImage(p.id, 'card')}
+                    alt={p.data.title}
+                    loading="lazy"
+                    style="width:100%;height:100%;object-fit:cover;display:block"
+                  />
+                )}
+                <span
+                  style="position:absolute;top:12px;left:12px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;background:rgba(18,18,27,.7);backdrop-filter:blur(6px);padding:4px 11px;border-radius:999px"
+                  >Parent trail report</span
+                >
+              </div>
+              <div style="padding:20px 22px 22px;display:flex;flex-direction:column;flex:1">
+                <h2 style="font-size:21px;font-weight:800;letter-spacing:-.4px;line-height:1.15;margin:0 0 10px">
+                  {p.data.title}
+                </h2>
+                <p style="font-size:12.5px;color:#6f6c64;margin:0 0 12px">{meta.join(' · ')}</p>
+                {p.data.description && (
+                  <p style="font-size:14.5px;line-height:1.5;color:#5d5a52;margin:0">
+                    {p.data.description}
+                  </p>
+                )}
+                <span
+                  class="ls-link"
+                  style="margin-top:auto;padding-top:16px;font-size:14px;font-weight:800;color:#d6391f"
+                  >Read the report &rarr;</span
+                >
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </section>
 </BaseLayout>

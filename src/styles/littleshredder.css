@@ -1,0 +1,269 @@
+/* ============================================================================
+   LittleShredder — single stylesheet
+   Palette + neo-brutalist hover/shadow rules copied verbatim from the design
+   <helmet> <style>, plus base reset, body type, the ls-float keyframes, and the
+   small reusable utilities (badges / pills / fact cards) used across views.
+   ========================================================================== */
+
+:root {
+  /* surfaces & ink */
+  --ls-bg: #fff3ec;
+  --ls-surface: #fff;
+  --ls-surface-warm: #fbf4ea;
+  --ls-ink: #1a1430; /* navy / brand black */
+  /* brand */
+  --ls-primary: #ff5a4d;
+  --ls-deep-red: #d6391f;
+  --ls-teal: #1fb6a6;
+  /* muted text */
+  --ls-muted: #5d5a52;
+  --ls-muted-2: #7c7a72;
+  --ls-muted-3: #9a978d;
+  --ls-muted-4: #8b887f;
+  /* hairlines */
+  --ls-line: #f1ddcf;
+  --ls-line-2: #f0ebe0;
+  --ls-line-3: #efeadd;
+  /* difficulty colours */
+  --ls-green: #1f8a4c;
+  --ls-blue: #2c72d2;
+  --ls-red: #d23b3b;
+  --ls-black: #1a1a1a;
+}
+
+/* ---- base reset (verbatim from design) ---- */
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+::-webkit-scrollbar { height: 10px; width: 10px; }
+::-webkit-scrollbar-thumb { background: #d8d0bf; border-radius: 999px; }
+
+body {
+  background: #fff3ec;
+  font-family: 'Archivo', sans-serif;
+  color: #1a1430;
+}
+
+/* UPPERCASE headings (verbatim from design) */
+h1, h2 { text-transform: uppercase !important; }
+
+/* float animation (verbatim from design) */
+@keyframes ls-float {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50% { transform: translateY(-7px) rotate(var(--r, 0deg)); }
+}
+.ls-float { animation: ls-float 5s ease-in-out infinite; }
+
+/* ---- hover / shadow rules (copied verbatim from design <style>) ---- */
+.ls-link:hover { color: #d6391f !important; }
+.ls-row:hover { background: #ffe9de !important; }
+.ls-nav:hover { color: #ff5a4d !important; }
+.ls-card { transition: transform .2s, box-shadow .2s; }
+.ls-card:hover { transform: translateY(-5px); box-shadow: 0 18px 40px rgba(24, 24, 27, .16) !important; }
+.ls-btn { transition: transform .15s; }
+.ls-btn:hover { transform: translateY(-2px); }
+.ls-chip:hover { border-color: #ff5a4d !important; }
+/* Keep the brand red border on focus, but restore a visible focus ring for
+   keyboard users (WCAG 2.4.7). Pointer focus (mouse click) stays clean via
+   :focus-visible. */
+input:focus { border-color: #ff5a4d !important; }
+input:focus-visible {
+  outline: 2px solid #1a1430;
+  outline-offset: 1px;
+  border-color: #ff5a4d !important;
+}
+/* Consistent visible focus ring across all interactive controls
+   (links, cards, chips, buttons, sortable headers). */
+a:focus-visible,
+button:focus-visible,
+.ls-chip:focus-visible,
+.ls-card:focus-visible,
+.overview th.sortable:focus-visible {
+  outline: 2px solid #1a1430;
+  outline-offset: 2px;
+}
+.ls-btn { border-radius: 10px !important; box-shadow: 4px 4px 0 #1a1430 !important; }
+.ls-btn:hover { transform: translate(-1px, -1px) !important; box-shadow: 6px 6px 0 #1a1430 !important; }
+.ls-card { border: 2.5px solid #1a1430 !important; border-radius: 16px !important; box-shadow: 6px 6px 0 #1a1430 !important; }
+.ls-card:hover { transform: translate(-2px, -2px) !important; box-shadow: 9px 9px 0 #1a1430 !important; }
+.ls-chip { border-width: 2px !important; }
+
+/* ---- reusable neo-brutalist frame ----
+   Pages inline their layout styles to mirror the design, but reach for these
+   so they don't re-declare the border/shadow/radius every time. */
+.ls-frame {
+  border: 2.5px solid var(--ls-ink);
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 var(--ls-ink);
+  background: var(--ls-surface);
+}
+.ls-frame-sm {
+  border: 2px solid var(--ls-ink);
+  border-radius: 16px;
+  box-shadow: 4px 4px 0 var(--ls-ink);
+  background: var(--ls-surface);
+}
+
+/* ---- difficulty pill badges (table + anywhere) ---- */
+.ls-diff {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+.ls-diff .ls-diff-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .8);
+}
+.ls-diff.green { background: var(--ls-green); }
+.ls-diff.blue { background: var(--ls-blue); }
+.ls-diff.red { background: var(--ls-red); }
+.ls-diff.black { background: var(--ls-black); }
+
+/* ---- generic small pills ---- */
+.ls-pill {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 2px solid var(--ls-ink);
+}
+.ls-pill-primary { background: var(--ls-primary); color: #fff; }
+.ls-pill-warm { background: var(--ls-surface-warm); color: var(--ls-ink); }
+
+/* yes/no token (gravity card) */
+.ls-token {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 7px;
+}
+.ls-token-yes { background: var(--ls-ink); color: #fff; }
+/* "NO" token: darker ink text on the cream chip for AA contrast
+   (#8b887f on #efeadd was 2.95:1 → #5d5a52 passes). */
+.ls-token-no { background: var(--ls-line-3); color: #5d5a52; }
+
+/* skills-area teal token — darkened teal so white 11px text meets >=3:1
+   (brand #1fb6a6 was 2.53:1; #127d70 passes the UI-component threshold). */
+.ls-token-skills {
+  display: inline-block;
+  background: #127d70;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 7px;
+  line-height: 1.3;
+}
+
+/* ---- fact card (detail "The facts") ---- */
+.ls-fact-card { overflow: hidden; }
+.ls-fact-card-head {
+  background: var(--ls-ink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  padding: 11px 18px;
+}
+
+/* ---- map fallback (BikeparkMap) ---- */
+.map-fallback {
+  border: 2.5px solid var(--ls-ink);
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 var(--ls-ink);
+  background: var(--ls-surface);
+  padding: 22px 24px;
+  color: var(--ls-muted);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+.map-fallback code {
+  background: var(--ls-surface-warm);
+  border: 1px solid var(--ls-line);
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 13px;
+}
+
+/* ---- table empty-state row ---- */
+.ov-empty {
+  text-align: center;
+  color: var(--ls-muted);
+  padding: 40px 16px;
+}
+
+/* ---- focusable sort headers + sort-direction carets ----
+   The sort JS toggles .sort-asc / .sort-desc on the active header; these rules
+   turn that into a visible caret (idle ↕, asc ▲, desc ▼). Scoped under
+   .overview so they never leak to other tables. */
+.overview th.sortable { cursor: pointer; }
+.overview th.sortable::after { content: " \2195"; opacity: .45; font-size: 11px; }
+.overview th.sort-asc::after { content: " \25B2"; opacity: 1; }
+.overview th.sort-desc::after { content: " \25BC"; opacity: 1; }
+
+/* ============================================================================
+   Responsive layer.
+   The page layouts are authored desktop-first with fixed multi-column grids
+   inlined to mirror the design. These rules collapse them on tablet/phone.
+   Pages opt in by adding the matching helper class to their grid containers.
+   ========================================================================== */
+
+/* Fluid headings so the hero/title type can't force horizontal scroll on
+   narrow viewports. Applied via class so we don't fight inline font-size. */
+.ls-h1-hero { font-size: clamp(34px, 9vw, 60px) !important; }
+.ls-h1-detail { font-size: clamp(30px, 7vw, 52px) !important; }
+.ls-h1-page { font-size: clamp(28px, 6vw, 42px) !important; }
+
+/* Generic grid collapses. Defaults are set inline on the element; these
+   override at breakpoints. */
+@media (max-width: 1040px) {
+  .ls-grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 760px) {
+  .ls-grid-2,
+  .ls-grid-3,
+  .ls-grid-4 { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 860px) {
+  .ls-grid-2-wide { grid-template-columns: 1fr !important; }
+}
+
+/* Trail-spotlight row: stack image over text on phones so the note paragraph
+   isn't squeezed into a sliver. */
+@media (max-width: 620px) {
+  .ls-spotlight { flex-direction: column !important; }
+  .ls-spotlight > .ls-spotlight-img {
+    width: 100% !important;
+    height: 160px;
+  }
+}
+
+/* Overview table: drop low-priority columns rather than scroll sideways.
+   Column order: 1 Park · 2 Location · 3 Drive · 4 Lift · 5 Gravity Card ·
+   6 Difficulty · 7 Vertical · 8 Skills · 9 Rating · 10 Best for */
+@media (max-width: 960px) {
+  .overview th:nth-child(4), .overview td:nth-child(4),
+  .overview th:nth-child(5), .overview td:nth-child(5),
+  .overview th:nth-child(8), .overview td:nth-child(8) { display: none; }
+}
+@media (max-width: 620px) {
+  .overview th:nth-child(2), .overview td:nth-child(2),
+  .overview th:nth-child(10), .overview td:nth-child(10) { display: none; }
+}
+
+/* Sticky nav: shrink padding + link gap on phones so the wordmark, links and
+   button don't overflow the viewport (no hamburger; the cluster wraps). */
+@media (max-width: 620px) {
+  .ls-nav-bar { padding: 0 16px !important; height: auto !important; flex-wrap: wrap; }
+  .ls-nav-cluster { gap: 14px !important; }
+  .ls-nav { font-size: 13px !important; }
+}

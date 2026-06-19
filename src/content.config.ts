@@ -26,6 +26,21 @@ const parks = defineCollection({
     region_label: z.string(),
     coords: z.object({ lat: z.number(), lng: z.number() }).nullable().optional(),
     pin_name: z.string().optional(),
+    // Family / kid-suitability layer (LittleShredder redesign) — all OPTIONAL so the
+    // existing 40 parks (which omit them) still validate; populated by the research agent.
+    tagline: z.string().optional(),
+    local_name: z.string().optional(),
+    season: z.string().optional(),
+    min_age: z.number().optional(),
+    family_pick: z.boolean().optional(),
+    diff: z.object({ green: z.number(), blue: z.number(), red: z.number(), black: z.number() }).partial().optional(),
+    family_flags: z.array(z.object({ label: z.string(), ok: z.boolean() })).optional(),
+    trail_spotlights: z.array(z.object({
+      name: z.string(), length: z.string().optional(), note: z.string(),
+      color: z.enum(['green', 'blue', 'red', 'black']).optional(),
+    })).optional(),
+    parent_notes: z.array(z.string()).optional(),
+    blog_intro: z.string().optional(),
     overview: z.object({
       name: z.string(),
       cells: z.object({

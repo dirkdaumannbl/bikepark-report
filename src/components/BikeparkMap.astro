@@ -16,7 +16,7 @@ const mapData = JSON.stringify({ pins, home });
 
 {mapsKey ? (
   <>
-    <div id="map"></div>
+    <div id="bikepark-map" class="ls-map"></div>
     <script type="application/json" id="bikepark-map-data" set:html={mapData}></script>
     <script is:inline>
       (function () {
@@ -25,7 +25,7 @@ const mapData = JSON.stringify({ pins, home });
 
         // Google Maps calls this if the key / referrer / API restriction rejects the page.
         window.gm_authFailure = function () {
-          var m = document.getElementById('map');
+          var m = document.getElementById('bikepark-map');
           if (!m) return;
           m.outerHTML =
             '<div class="map-fallback"><strong>Google Maps could not authenticate this page.</strong><br>' +
@@ -35,7 +35,7 @@ const mapData = JSON.stringify({ pins, home });
         };
 
         function initBikeparkMap() {
-          var node = document.getElementById('map');
+          var node = document.getElementById('bikepark-map');
           if (!node) return;
           if (!(window.google && google.maps)) {
             node.outerHTML =
@@ -93,3 +93,18 @@ const mapData = JSON.stringify({ pins, home });
     in a local <code>.env</code> and in Vercel's environment variables to enable it.
   </div>
 )}
+
+<style is:global>
+  /* Neo-brutalist frame for the live Google Map — navy 2.5px border, 6px hard
+     offset shadow, radius 16. (The decorative SVG map from the design is NOT
+     used; this stays the real interactive Google map.) */
+  .ls-map {
+    width: 100%;
+    height: 520px;
+    border: 2.5px solid #1a1430;
+    border-radius: 16px;
+    box-shadow: 6px 6px 0 #1a1430;
+    overflow: hidden;
+    background: linear-gradient(160deg, #dcefe4, #fff3ec);
+  }
+</style>

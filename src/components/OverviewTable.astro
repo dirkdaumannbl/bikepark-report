@@ -1,98 +1,246 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { driveParts, diffCounts, ratingLabel } from '../lib/parkDerive';
 
 interface Props {
   parks: CollectionEntry<'parks'>[];
+  /** Home origin label for the "Drive from …" column header. */
+  homeBase?: string;
 }
-const { parks } = Astro.props;
+const { parks, homeBase = 'Berlin' } = Astro.props;
 
-// Columns after the Park name cell: [cell key in overview.cells, sort key in overview.sort | null].
-const OV_COLS: [string, string | null][] = [
-  ['location', null],
-  ['drive', 'drive_km'],
-  ['lift', null],
-  ['gravity_card', 'gravity_card'],
-  ['difficulty', 'difficulty'],
-  ['vertical', 'vertical_m'],
-  ['skills', 'skills'],
-  ['rating', 'rating'],
-  ['best_for', null],
-];
+const stripTags = (s: string) =>
+  (s || '').replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
 
-// Mirror build_report.py compact_drive(): the overview Drive cell shows distance/time only;
-// the cited source link lives in each park's detail "Drive from Berlin" row.
-const stripDriveSrc = (s: string) =>
-  s.replace(/\s*<a\b[^>]*class="src"[^>]*>.*?<\/a>/s, '').trim();
+// Normalize country synonyms so chip filters group them together (the data
+// carries both "Czech Republic" and "Czechia"; the chip value is "czechia").
+const COUNTRY_SYNONYMS: Record<string, string> = {
+  'czech republic': 'czechia',
+  czechia: 'czechia',
+};
+const normCountry = (c: string) => COUNTRY_SYNONYMS[c.toLowerCase()] ?? c.toLowerCase();
 
-// Precompute rows in the frontmatter (pure TS) so the template stays free of type casts.
+// Split region_label "City, …rest…, Country" → city / regionLine / country.
+function splitRegion(label: string) {
+  const segs = (label || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const city = segs[0] || '';
+  const country = segs.length > 1 ? segs[segs.length - 1] : '';
+  const regionLine = segs.slice(1).join(' · ');
+  return { city, country, regionLine };
+}
+
+// Precompute every row's display + filter/sort + chip-filter attributes in
+// frontmatter so the template stays free of casts.
 const rows = parks.map((entry) => {
   const cells = entry.data.overview.cells as Record<string, string>;
   const sort = entry.data.overview.sort as Record<string, number | null>;
-  const cols = OV_COLS.map(([key, sortKey]) => {
-    const cell = key === 'drive' ? stripDriveSrc(cells[key]) : cells[key];
-    const dataSort = sortKey ? (sort[sortKey] == null ? '' : String(sort[sortKey])) : null;
-    return { cell, dataSort };
-  });
-  return { slug: entry.id, nameHtml: entry.data.overview.name, cols };
+  const drive = driveParts(cells.drive);
+  const diff = diffCounts(entry);
+  const { city, country, regionLine } = splitRegion(entry.data.region_label);
+  const gravityCard = sort.gravity_card === 1;
+  const skillsText = stripTags(cells.skills);
+  const vertical = sort.vertical_m;
+
+  return {
+    slug: entry.id,
+    nameHtml: entry.data.overview.name,
+    liftHtml: cells.lift,
+    bestForHtml: cells.best_for,
+    city,
+    regionLine,
+    country,
+    drive,
+    driveKm: sort.drive_km,
+    gravityCard,
+    diff,
+    vertical,
+    verticalSort: vertical,
+    skillsText,
+    rating: ratingLabel(sort.rating),
+    ratingSort: sort.rating,
+    diffSort: sort.difficulty,
+    // chip-filter data attributes
+    dataCountry: normCountry(country),
+    dataGravity: gravityCard ? '1' : '0',
+    // Black runs exist if a black badge is present (count may be 0 for the
+    // presence-only parks) — so the Gentle (no black runs) chip excludes them.
+    dataHasBlack: diff.present.black ? '1' : '0',
+  };
 });
+
+const resultCount = rows.length;
+const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n));
 ---
 
-<div class="overview">
-  <table>
-    <thead>
-      <tr class="head">
-        <th class="sortable" data-col="0" data-type="text">Park</th>
-        <th class="sortable" data-col="1" data-type="text">Location</th>
-        <th class="sortable" data-col="2" data-type="num">Drive from Berlin</th>
-        <th class="sortable" data-col="3" data-type="text">Lift</th>
-        <th class="sortable" data-col="4" data-type="num">Gravity Card</th>
-        <th class="sortable" data-col="5" data-type="num">Difficulty spread</th>
-        <th class="sortable" data-col="6" data-type="num">Vertical</th>
-        <th class="sortable" data-col="7" data-type="num">Skills area</th>
-        <th class="sortable" data-col="8" data-type="num">Rating</th>
-        <th class="sortable" data-col="9" data-type="text">Best for</th>
-      </tr>
-      <tr class="filters">
-        <th><input data-col="0" placeholder="Filter…" aria-label="Filter Park" /></th>
-        <th><input data-col="1" placeholder="Filter…" aria-label="Filter Location" /></th>
-        <th><input data-col="2" placeholder="Filter…" aria-label="Filter Drive" /></th>
-        <th><input data-col="3" placeholder="Filter…" aria-label="Filter Lift" /></th>
-        <th><input data-col="4" placeholder="Filter…" aria-label="Filter Gravity Card" /></th>
-        <th><input data-col="5" placeholder="Filter…" aria-label="Filter Difficulty" /></th>
-        <th><input data-col="6" placeholder="Filter…" aria-label="Filter Vertical" /></th>
-        <th><input data-col="7" placeholder="Filter…" aria-label="Filter Skills area" /></th>
-        <th><input data-col="8" placeholder="Filter…" aria-label="Filter Rating" /></th>
-        <th><input data-col="9" placeholder="Filter…" aria-label="Filter Best for" /></th>
-      </tr>
-    </thead>
-    <tbody>
-      {
-        rows.map((row) => (
-          <tr>
-            <td><a href={`/parks/${row.slug}/`} set:html={row.nameHtml} /></td>
-            {row.cols.map((c) =>
-              c.dataSort === null ? (
-                <td set:html={c.cell} />
-              ) : (
-                <td data-sort={c.dataSort} set:html={c.cell} />
-              )
-            )}
-          </tr>
-        ))
-      }
-    </tbody>
-  </table>
-</div>
+<section style="max-width:1280px;margin:0 auto;padding:48px 40px 64px">
+  <h1 class="ls-h1-page" style="font-size:42px;font-weight:800;letter-spacing:-1.2px;margin:0 0 8px">Browse bikeparks</h1>
+  <p style="font-size:17px;color:#5d5a52;margin:0 0 24px">
+    <span class="ov-result-count">{resultCount}</span> family-friendly parks. Sort or filter on any
+    column — click a row for the full guide.
+  </p>
+
+  {/* ---- filter chips (client-driven; AND-combined with per-column filters).
+       Rendered as <button> with aria-pressed so keyboard + AT users can toggle
+       them; refreshChipStyles() keeps aria-pressed in sync with chipState. ---- */}
+  <div class="ov-chips" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+    <button
+      type="button"
+      class="ls-chip ov-chip is-active"
+      data-chip-group="country"
+      data-chip-value="all"
+      aria-pressed="true"
+      style="cursor:pointer;padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:inherit;border:1.5px solid #ff5a4d;background:#ff5a4d;color:#fff;transition:border-color .2s"
+      >All countries</button
+    >
+    <button
+      type="button"
+      class="ls-chip ov-chip"
+      data-chip-group="country"
+      data-chip-value="germany"
+      aria-pressed="false"
+      style="cursor:pointer;padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:inherit;border:1.5px solid #f1ddcf;background:#fff;color:#1a1430;transition:border-color .2s"
+      >Germany</button
+    >
+    <button
+      type="button"
+      class="ls-chip ov-chip"
+      data-chip-group="country"
+      data-chip-value="czechia"
+      aria-pressed="false"
+      style="cursor:pointer;padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:inherit;border:1.5px solid #f1ddcf;background:#fff;color:#1a1430;transition:border-color .2s"
+      >Czechia</button
+    >
+    <span aria-hidden="true" style="width:1px;background:#f1ddcf;margin:4px 4px"></span>
+    <button
+      type="button"
+      class="ls-chip ov-chip"
+      data-chip-group="gravity"
+      data-chip-value="1"
+      aria-pressed="false"
+      style="cursor:pointer;padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:inherit;border:1.5px solid #f1ddcf;background:#fff;color:#1a1430;transition:border-color .2s"
+      >Gravity Card only</button
+    >
+    <button
+      type="button"
+      class="ls-chip ov-chip"
+      data-chip-group="gentle"
+      data-chip-value="1"
+      aria-pressed="false"
+      style="cursor:pointer;padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:inherit;border:1.5px solid #f1ddcf;background:#fff;color:#1a1430;transition:border-color .2s"
+      >Gentle (no black runs)</button
+    >
+  </div>
+
+  <div class="overview" style="overflow-x:auto;border-radius:16px;border:2.5px solid #1a1430;box-shadow:6px 6px 0 #1a1430;background:#fff">
+    <table style="border-collapse:collapse;width:100%;min-width:1180px;font-size:14px">
+      <thead>
+        <tr class="head" style="background:#1a1430;color:#fff">
+          <th class="sortable" data-col="0" data-type="text" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Park</th>
+          <th data-col="1" data-type="text" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Location</th>
+          <th class="sortable" data-col="2" data-type="num" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Drive from {homeBase}</th>
+          <th data-col="3" data-type="text" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Lift</th>
+          <th data-col="4" data-type="num" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Gravity Card</th>
+          <th data-col="5" data-type="num" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Difficulty spread</th>
+          <th class="sortable" data-col="6" data-type="num" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Vertical</th>
+          <th data-col="7" data-type="text" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Skills area</th>
+          <th class="sortable" data-col="8" data-type="num" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Rating</th>
+          <th data-col="9" data-type="text" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Best for</th>
+        </tr>
+        <tr class="filters" style="background:#fff3ec">
+          <th style="padding:8px 12px"><input data-col="0" placeholder="Filter…" aria-label="Filter Park" style="width:100%;min-width:130px;height:32px;padding:0 10px;border:1px solid #f1ddcf;border-radius:8px;font-size:13px;font-family:'Archivo',sans-serif;background:#fff" /></th>
+          <th style="padding:8px 12px"><input data-col="1" placeholder="Filter…" aria-label="Filter Location" style="width:100%;min-width:160px;height:32px;padding:0 10px;border:1px solid #f1ddcf;border-radius:8px;font-size:13px;font-family:'Archivo',sans-serif;background:#fff" /></th>
+          <th style="padding:8px 12px"></th>
+          <th style="padding:8px 12px"><input data-col="3" placeholder="Filter…" aria-label="Filter Lift" style="width:100%;min-width:110px;height:32px;padding:0 10px;border:1px solid #f1ddcf;border-radius:8px;font-size:13px;font-family:'Archivo',sans-serif;background:#fff" /></th>
+          <th style="padding:8px 12px"></th>
+          <th style="padding:8px 12px"></th>
+          <th style="padding:8px 12px"></th>
+          <th style="padding:8px 12px"></th>
+          <th style="padding:8px 12px"></th>
+          <th style="padding:8px 12px"><input data-col="9" placeholder="Filter…" aria-label="Filter Best for" style="width:100%;min-width:120px;height:32px;padding:0 10px;border:1px solid #f1ddcf;border-radius:8px;font-size:13px;font-family:'Archivo',sans-serif;background:#fff" /></th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr
+              class="ls-row"
+              data-href={`/parks/${row.slug}/`}
+              data-country={row.dataCountry}
+              data-gravity={row.dataGravity}
+              data-hasblack={row.dataHasBlack}
+              style="cursor:pointer;border-bottom:1px solid #f0ebe0;transition:background .15s"
+            >
+              <td style="padding:16px;font-weight:800;white-space:nowrap">
+                <a href={`/parks/${row.slug}/`} style="color:inherit;text-decoration:none" set:html={row.nameHtml} />
+              </td>
+              <td style="padding:16px;color:#5d5a52;line-height:1.4">
+                {row.city}
+                <br />
+                <span style="font-size:13px">{row.regionLine}</span>
+              </td>
+              <td data-sort={numOrEmpty(row.driveKm)} style="padding:16px;white-space:nowrap;font-weight:600">
+                {row.drive.kmLabel}
+                <br />
+                <span style="color:#6f6c64;font-size:13px;font-weight:400">{row.drive.time}</span>
+              </td>
+              <td style="padding:16px;color:#5d5a52" set:html={row.liftHtml} />
+              <td data-sort={row.gravityCard ? '1' : '0'} style="padding:16px">
+                {row.gravityCard ? (
+                  <span class="ls-token ls-token-yes">YES</span>
+                ) : (
+                  <span class="ls-token ls-token-no">NO</span>
+                )}
+              </td>
+              <td data-sort={numOrEmpty(row.diffSort)} style="padding:16px">
+                <div style="display:flex;gap:5px;flex-wrap:wrap;max-width:150px">
+                  {row.diff.present.green && (
+                    <span class="ls-diff green"><span class="ls-diff-dot" />{row.diff.green > 0 ? row.diff.green : ''}</span>
+                  )}
+                  {row.diff.present.blue && (
+                    <span class="ls-diff blue"><span class="ls-diff-dot" />{row.diff.blue > 0 ? row.diff.blue : ''}</span>
+                  )}
+                  {row.diff.present.red && (
+                    <span class="ls-diff red"><span class="ls-diff-dot" />{row.diff.red > 0 ? row.diff.red : ''}</span>
+                  )}
+                  {row.diff.present.black && (
+                    <span class="ls-diff black"><span class="ls-diff-dot" />{row.diff.black > 0 ? row.diff.black : ''}</span>
+                  )}
+                </div>
+              </td>
+              <td data-sort={numOrEmpty(row.verticalSort)} style="padding:16px;white-space:nowrap;font-weight:600">
+                {row.vertical == null ? '—' : `~${row.vertical} m`}
+              </td>
+              <td style="padding:16px">
+                <span class="ls-token-skills">{row.skillsText}</span>
+              </td>
+              <td data-sort={numOrEmpty(row.ratingSort)} style="padding:16px;font-weight:800;white-space:nowrap">
+                {row.rating}
+                <span style="color:#6f6c64;font-weight:500">/5</span>
+              </td>
+              <td style="padding:16px;color:#5d5a52;max-width:150px" set:html={row.bestForHtml} />
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
 
 <script>
-  /* ---- overview table: click-to-sort + per-column filter (self-contained) ---- */
+  /* ---- overview table: click-to-sort + per-column filter + chip filters ---- */
   (function () {
+    var section = document.currentScript
+      ? document.currentScript.closest('section')
+      : null;
     var table = document.querySelector('.overview table');
     if (!table || !table.tBodies[0]) return;
+    var root = section || document;
     var tbody = table.tBodies[0];
     var headRow = table.querySelector('thead tr.head');
     var filterRow = table.querySelector('thead tr.filters');
     var colCount = headRow ? headRow.cells.length : 10;
+    var chips = Array.prototype.slice.call(root.querySelectorAll('.ov-chip'));
+    var countEl = root.querySelector('.ov-result-count');
 
     function dataRows() {
       return Array.prototype.filter.call(tbody.rows, function (r) {
@@ -103,6 +251,15 @@ const rows = parks.map((entry) => {
       var c = row.cells[idx];
       return c ? (c.textContent || '').trim() : '';
     }
+
+    /* ---- click a row → navigate to its park guide (skip clicks on links) ---- */
+    dataRows().forEach(function (row) {
+      row.addEventListener('click', function (e) {
+        if (e.target && e.target.closest && e.target.closest('a')) return;
+        var href = row.getAttribute('data-href');
+        if (href) window.location.href = href;
+      });
+    });
 
     /* ---- sorting ---- */
     var sortCol = -1, sortDir = 1;
@@ -134,19 +291,74 @@ const rows = parks.map((entry) => {
       if (empty) tbody.appendChild(empty);
       Array.prototype.forEach.call(headRow.cells, function (th) {
         th.className = th.className.replace(/\s*sort-(asc|desc)/g, '');
+        // Reset aria-sort on every sortable header, then set it on the active one below.
+        if (th.className.indexOf('sortable') !== -1) th.setAttribute('aria-sort', 'none');
       });
-      headRow.cells[col].className += sortDir === 1 ? ' sort-asc' : ' sort-desc';
+      var active = headRow.cells[col];
+      active.className += sortDir === 1 ? ' sort-asc' : ' sort-desc';
+      active.setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
     }
     if (headRow) {
       Array.prototype.forEach.call(headRow.cells, function (th) {
         if (th.className.indexOf('sortable') === -1) return;
-        th.addEventListener('click', function () {
+        // Make the header focusable + announce it as a sort control.
+        th.setAttribute('tabindex', '0');
+        th.setAttribute('role', 'button');
+        th.setAttribute('aria-sort', 'none');
+        function trigger() {
           sortBy(parseInt(th.getAttribute('data-col'), 10), th.getAttribute('data-type'));
+        }
+        th.addEventListener('click', trigger);
+        th.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+            e.preventDefault();
+            trigger();
+          }
         });
       });
     }
 
-    /* ---- filtering ---- */
+    /* ---- chip filter state ---- */
+    var chipState = { country: 'all', gravity: false, gentle: false };
+    function styleChip(chip, active) {
+      chip.setAttribute('aria-pressed', active ? 'true' : 'false');
+      if (active) {
+        chip.className = chip.className.indexOf('is-active') === -1
+          ? chip.className + ' is-active' : chip.className;
+        chip.style.background = '#ff5a4d';
+        chip.style.color = '#fff';
+        chip.style.borderColor = '#ff5a4d';
+      } else {
+        chip.className = chip.className.replace(/\s*is-active/g, '');
+        chip.style.background = '#fff';
+        chip.style.color = '#1a1430';
+        chip.style.borderColor = '#f1ddcf';
+      }
+    }
+    function refreshChipStyles() {
+      chips.forEach(function (chip) {
+        var g = chip.getAttribute('data-chip-group');
+        var v = chip.getAttribute('data-chip-value');
+        var active = false;
+        if (g === 'country') active = chipState.country === v;
+        else if (g === 'gravity') active = chipState.gravity;
+        else if (g === 'gentle') active = chipState.gentle;
+        styleChip(chip, active);
+      });
+    }
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var g = chip.getAttribute('data-chip-group');
+        var v = chip.getAttribute('data-chip-value');
+        if (g === 'country') chipState.country = v;
+        else if (g === 'gravity') chipState.gravity = !chipState.gravity;
+        else if (g === 'gentle') chipState.gentle = !chipState.gentle;
+        refreshChipStyles();
+        applyFilters();
+      });
+    });
+
+    /* ---- filtering (per-column inputs AND chip filters) ---- */
     var emptyRow = null;
     function ensureEmptyRow() {
       if (emptyRow) return emptyRow;
@@ -160,6 +372,13 @@ const rows = parks.map((entry) => {
       tbody.appendChild(emptyRow);
       return emptyRow;
     }
+    function rowPassesChips(row) {
+      if (chipState.country !== 'all' &&
+          (row.getAttribute('data-country') || '') !== chipState.country) return false;
+      if (chipState.gravity && row.getAttribute('data-gravity') !== '1') return false;
+      if (chipState.gentle && row.getAttribute('data-hasblack') !== '0') return false;
+      return true;
+    }
     function applyFilters() {
       var terms = [];
       if (filterRow) {
@@ -170,14 +389,17 @@ const rows = parks.map((entry) => {
       }
       var visible = 0;
       dataRows().forEach(function (row) {
-        var show = true;
-        for (var i = 0; i < terms.length; i++) {
-          if (cellText(row, terms[i].col).toLowerCase().indexOf(terms[i].v) === -1) { show = false; break; }
+        var show = rowPassesChips(row);
+        if (show) {
+          for (var i = 0; i < terms.length; i++) {
+            if (cellText(row, terms[i].col).toLowerCase().indexOf(terms[i].v) === -1) { show = false; break; }
+          }
         }
         row.style.display = show ? '' : 'none';
         if (show) visible++;
       });
       ensureEmptyRow().style.display = visible === 0 ? '' : 'none';
+      if (countEl) countEl.textContent = String(visible);
     }
     if (filterRow) filterRow.addEventListener('input', applyFilters);
   })();

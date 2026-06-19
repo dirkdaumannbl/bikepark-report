@@ -5,8 +5,18 @@ import BikeparkMap from '../../components/BikeparkMap.astro';
 import OverviewTable from '../../components/OverviewTable.astro';
 import report from '../../../data/bikeparks.json';
 
-const parks = (await getCollection('parks')).sort((a, b) => a.data.parkNo - b.data.parkNo);
+// Sort parks by parkNo (mirrors the design's stable ordering).
+const parks = (await getCollection('parks')).sort(
+  (a, b) => a.data.parkNo - b.data.parkNo
+);
 
+// Home origin (Berlin) for the "Drive from …" copy and the map's home marker.
+const home = report.home;
+const homeBase = 'Berlin';
+
+// Build map pins from every park that has real coordinates (contract: show all
+// pins on /parks/). The decorative SVG map from the design is intentionally
+// NOT used — BikeparkMap renders the real, restyled Google map.
 const pins = parks
   .map((p) => ({
     name: p.data.pin_name ?? p.data.overview.name,
@@ -14,29 +24,28 @@ const pins = parks
     lat: p.data.coords?.lat,
     lng: p.data.coords?.lng,
   }))
-  .filter((p): p is { name: string; region: string; lat: number; lng: number } =>
-    p.lat != null && p.lng != null
+  .filter(
+    (p): p is { name: string; region: string; lat: number; lng: number } =>
+      p.lat != null && p.lng != null
   );
-
-const home = report.home;
-const generated = report.generated_date;
 ---
 
 <BaseLayout
-  title="Parks"
-  description="Map and sortable comparison of gravity bike parks reachable from Berlin."
+  title="Browse bikeparks"
+  description="Sortable, filterable comparison of family-friendly gravity bike parks, plus a map with drive times from Berlin."
 >
-  <header class="page-hero">
-    <h1>Bike parks</h1>
-    <p class="lede">
-      <b>{parks.length}</b> parks · driving distances from Oskar-Helene-Park 7, 14195 Berlin{
-        generated ? ` · data ${generated}` : ''
-      }. Every value links to a source; unverified items are marked “Not found”.
+  {/* ---- Overview: hero ("Browse bikeparks", real count) + chips + table ----
+       OverviewTable renders the full <section> (heading, result count, chip row,
+       and the framed sortable/filterable table) — the page just passes the
+       parkNo-sorted collection and the home label. */}
+  <OverviewTable parks={parks} homeBase={homeBase} />
+
+  {/* ---- Map section (mirrors design lines 276–326; nav "Map" → /parks/#map) ---- */}
+  <section id="map" style="max-width:1280px;margin:0 auto;padding:48px 40px 64px">
+    <h2 class="ls-h1-page" style="font-size:42px;font-weight:800;letter-spacing:-1.2px;margin:0 0 8px">Parks on the map</h2>
+    <p style="font-size:17px;color:#5d5a52;margin:0 0 24px">
+      Central Europe, with drive times from {homeBase}. Tap a pin to preview a park.
     </p>
-  </header>
-
-  <BikeparkMap pins={pins} home={home} />
-
-  <h2 class="section-h" style="margin-top:28px">Overview</h2>
-  <OverviewTable parks={parks} />
+    <BikeparkMap pins={pins} home={home} />
+  </section>
 </BaseLayout>

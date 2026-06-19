@@ -1,19 +1,60 @@
 ---
+/**
+ * Sticky site nav (design lines 63–77). Logo SVG + "LittleShredder" wordmark,
+ * real internal hrefs (root-absolute, no base path) with aria-current active
+ * state, and the "Find a park" button.
+ */
 const path = Astro.url.pathname;
-const nav = [
+
+const items = [
   { label: 'Home', href: '/' },
-  { label: 'Parks', href: '/parks/' },
+  { label: 'Browse parks', href: '/parks/' },
+  { label: 'Map', href: '/parks/#map' },
   { label: 'Blog', href: '/blog/' },
-  { label: 'About', href: '/about/' },
 ];
-const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+
+// Active when the current path matches the item's base route (ignoring #hash).
+const isActive = (href: string) => {
+  const base = href.split('#')[0];
+  if (base === '/') return path === '/';
+  return path === base || path.startsWith(base);
+};
 ---
 
-<header class="site-nav">
-  <a class="brand" href="/">Bikepark Report</a>
-  <nav>
-    {nav.map((i) => (
-      <a href={i.href} aria-current={isActive(i.href) ? 'page' : undefined}>{i.label}</a>
-    ))}
-  </nav>
-</header>
+<nav
+  class="ls-nav-bar"
+  style="position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;height:66px;padding:0 40px;background:rgba(251,247,239,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid #f1ddcf"
+>
+  <a href="/" style="display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none;color:inherit">
+    <svg width="32" height="30" viewBox="0 0 220 200">
+      <circle cx="108" cy="92" r="70" fill="#ff5a4d"></circle>
+      <path d="M44 112 q12 58 64 58 q56 0 66 -52 q-30 24 -66 24 q-44 0 -64 -30 z" fill="#d6391f"></path>
+      <path d="M58 100 q10 40 50 40 q42 0 50 -40 q-26 14 -50 14 q-28 0 -50 -14 z" fill="#fff3ec"></path>
+      <rect x="56" y="60" width="104" height="40" rx="20" fill="#1a1430"></rect>
+      <rect x="64" y="67" width="34" height="13" rx="6.5" fill="#1fb6a6"></rect>
+      <path d="M46 64 q62 -36 126 -4 q-7 -18 -30 -25 q-42 -12 -78 4 q-15 9 -18 25 z" fill="#1a1430"></path>
+    </svg>
+    <span style="font-size:20px;font-weight:800;letter-spacing:-.5px">LittleShredder</span>
+  </a>
+  <div class="ls-nav-cluster" style="display:flex;align-items:center;flex-wrap:wrap;gap:30px">
+    {
+      items.map((i) => (
+        <a
+          class="ls-nav"
+          href={i.href}
+          aria-current={isActive(i.href) ? 'page' : undefined}
+          style="cursor:pointer;font-size:15px;font-weight:600;transition:color .2s;text-decoration:none;color:inherit"
+        >
+          {i.label}
+        </a>
+      ))
+    }
+    <a
+      href="/parks/"
+      class="ls-btn"
+      style="cursor:pointer;display:inline-flex;align-items:center;height:42px;padding:0 20px;border-radius:12px;background:#ff5a4d;color:#fff;font-size:14px;font-weight:800;box-shadow:0 4px 12px rgba(255,90,77,.35);text-decoration:none"
+    >
+      Find a park
+    </a>
+  </div>
+</nav>
