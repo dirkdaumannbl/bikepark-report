@@ -1,38 +1,192 @@
 ---
+/**
+ * Home (`/`) — the design's `isHome` view (ls_sendsquad_new.html lines 79–197).
+ * Hero with stock photo + diagonal gradients + floating badges + Rocco mascot,
+ * three value boxes, a FEATURED parks grid (prefer family_pick then top rating,
+ * up to 6) and a CTA band. Markup + inline styles mirror the design; bindings
+ * are wired to the `parks` content collection per the build contract.
+ */
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Mascot from '../components/Mascot.astro';
+import { parkImage } from '../lib/stockImages';
+import { driveParts, ratingLabel } from '../lib/parkDerive';
 
 const parks = await getCollection('parks');
-const posts = (await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3);
-const fmt = (d: Date) =>
-  d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const parkCount = parks.length;
+
+/* Featured: prefer family_pick, then highest sort.rating; take up to 6.
+   Stable secondary order keeps deterministic output for equal ratings. */
+const featured = [...parks]
+  .sort((a, b) => {
+    const fp = Number(b.data.family_pick === true) - Number(a.data.family_pick === true);
+    if (fp !== 0) return fp;
+    const rb = b.data.overview.sort.rating ?? -Infinity;
+    const ra = a.data.overview.sort.rating ?? -Infinity;
+    if (rb !== ra) return rb - ra;
+    return a.data.overview.name.localeCompare(b.data.overview.name);
+  })
+  .slice(0, 6);
+
+const homeBase = 'Berlin';
+
+/** Per-card view-model derived from the verbatim research data. */
+const cards = featured.map((p) => {
+  const segs = p.data.region_label.split(',').map((s) => s.trim());
+  const city = segs[0] ?? p.data.region_label;
+  const country = segs[segs.length - 1] ?? '';
+  const locShort = country && country !== city ? `${city}, ${country}` : city;
+  const { time } = driveParts(p.data.overview.cells.drive);
+  return {
+    href: `/parks/${p.id}/`,
+    img: parkImage(p.id, 'card'),
+    familyPick: p.data.family_pick === true,
+    rating: ratingLabel(p.data.overview.sort.rating),
+    name: p.data.overview.name, // HTML -> set:html
+    locShort,
+    driveTime: time,
+    bestFor: p.data.overview.cells.best_for, // HTML -> set:html
+  };
+});
 ---
 
-<BaseLayout description="A researched, fully-sourced guide to gravity bike parks reachable from Berlin.">
-  <header class="page-hero">
-    <h1>Gravity bike parks, researched</h1>
-    <p class="lede">
-      A fully-sourced comparison of <b>{parks.length}</b> downhill &amp; gravity bike parks
-      reachable by car from Berlin — driving times, lift type, difficulty spread, vertical drop,
-      skills areas and more. Open any park for the full breakdown, the map, or the sortable table.
-    </p>
-  </header>
-  <p><a class="btn" href="/parks/">Explore the parks &rarr;</a></p>
-
-  {posts.length > 0 && (
-    <section class="related" style="border-top:none;padding-top:0;margin-top:34px">
-      <h2 class="section-h">Latest from the blog</h2>
-      <ul class="post-list">
-        {posts.map((p) => (
-          <li class="post-card">
-            <a class="post-title" href={`/blog/${p.id}/`}>{p.data.title}</a>
-            <div class="post-meta">{fmt(p.data.date)}</div>
-            {p.data.description && <p>{p.data.description}</p>}
-          </li>
-        ))}
-      </ul>
+<BaseLayout
+  description="Honest, parent-first guides to Europe's bikeparks — the flow, the lifts, the kids' areas and the drive times, all in one place."
+>
+  <div>
+    <!-- HERO -->
+    <section style="position:relative;height:640px;overflow:hidden;background:#1a1430">
+      <img
+        src="https://images.unsplash.com/photo-1556131056-e6c3c6fa0e48?auto=format&fit=crop&w=2200&q=80"
+        alt=""
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%"
+      />
+      <div style="position:absolute;inset:0;background:linear-gradient(95deg,rgba(18,18,27,.82) 0%,rgba(18,18,27,.55) 42%,rgba(18,18,27,.05) 75%)"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,27,.6) 0%,rgba(18,18,27,0) 40%)"></div>
+      <svg viewBox="0 0 1200 640" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;opacity:.2;pointer-events:none">
+        <g fill="none" stroke="#ff5a4d" stroke-width="2">
+          <path d="M-20 470 q220 -70 460 -24 t760 -44"></path>
+          <path d="M-20 510 q220 -70 460 -24 t760 -44"></path>
+          <path d="M-20 550 q220 -70 460 -24 t760 -44"></path>
+          <path d="M-20 590 q220 -70 460 -24 t760 -44"></path>
+        </g>
+      </svg>
+      <div style="position:relative;max-width:1240px;margin:0 auto;height:100%;padding:0 40px;display:flex;flex-direction:column;justify-content:center">
+        <div style="max-width:620px">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:7px 14px;border-radius:999px;margin-bottom:22px">
+            <span style="width:8px;height:8px;border-radius:999px;background:#ff5a4d"></span>Family mountain biking · Europe
+          </div>
+          <h1 class="ls-h1-hero" style="font-weight:900;font-size:60px;line-height:.96;letter-spacing:-2px;text-transform:uppercase;color:#fff;margin:0 0 18px;text-wrap:balance">
+            Your basecamp for little shredders.
+          </h1>
+          <p style="font-size:18px;line-height:1.5;color:rgba(255,255,255,.88);margin:0 0 30px;max-width:480px">
+            Honest, parent-first guides to Europe's bikeparks — the flow, the lifts, the kids'
+            areas and the drive times, all in one place.
+          </p>
+          <div style="display:flex;gap:14px;align-items:center">
+            <a href="/parks/" class="ls-btn" style="cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:54px;padding:0 28px;border-radius:14px;background:#ff5a4d;color:#fff;font-weight:800;font-size:16px;box-shadow:0 10px 26px rgba(255,90,77,.45)">Find a park</a>
+            <a href="/parks/#map" class="ls-btn" style="cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;height:54px;padding:0 26px;border-radius:14px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.35);color:#fff;font-weight:800;font-size:16px">See the map</a>
+          </div>
+        </div>
+      </div>
+      <span style="position:absolute;top:96px;right:288px;background:#ff5a4d;color:#fff;font-size:13px;font-weight:800;padding:8px 15px;border-radius:999px;animation:ls-float 5s ease-in-out infinite;box-shadow:3px 3px 0 #1a1430;border:2px solid #1a1430">Groms welcome!</span>
+      <span style="position:absolute;top:124px;right:64px;background:#fff;color:#1a1430;font-size:13px;font-weight:800;padding:8px 15px;border-radius:999px;animation:ls-float 6s ease-in-out infinite;box-shadow:3px 3px 0 #1a1430;border:2px solid #1a1430">Riders from age 5</span>
+      <div style="position:absolute;bottom:44px;right:76px">
+        <Mascot bubble="Let's find your trail!" caption="I'm Rocco" size={134} variant="sky" />
+      </div>
     </section>
-  )}
+
+    <!-- VALUE BOXES -->
+    <section style="max-width:1240px;margin:0 auto;padding:64px 40px 24px">
+      <h2 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0">What LittleShredder gives you</h2>
+      <div class="ls-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+        <div style="position:relative;height:300px;border-radius:16px;overflow:hidden;border:2.5px solid #1a1430;box-shadow:6px 6px 0 #1a1430">
+          <img src="https://images.unsplash.com/photo-1572854875376-d4c543b06ea8?auto=format&fit=crop&w=1100&q=80" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+          <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,27,.86) 5%,rgba(18,18,27,.15) 60%)"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;padding:24px">
+            <div style="display:inline-flex;width:40px;height:40px;border-radius:11px;background:#ff5a4d;align-items:center;justify-content:center;margin-bottom:12px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+            </div>
+            <h3 style="font-size:21px;font-weight:800;color:#fff;margin:0 0 6px;letter-spacing:-.3px">Compare at a glance</h3>
+            <p style="font-size:14px;line-height:1.45;color:rgba(255,255,255,.82);margin:0">Difficulty spread, kids' areas, lifts and drive time — side by side.</p>
+          </div>
+        </div>
+        <div style="position:relative;height:300px;border-radius:16px;overflow:hidden;border:2.5px solid #1a1430;box-shadow:6px 6px 0 #1a1430">
+          <img src="https://images.unsplash.com/photo-1650130504767-b5df679feff3?auto=format&fit=crop&w=1100&q=80" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+          <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,27,.86) 5%,rgba(18,18,27,.15) 60%)"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;padding:24px">
+            <div style="display:inline-flex;width:40px;height:40px;border-radius:11px;background:#1fb6a6;align-items:center;justify-content:center;margin-bottom:12px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            </div>
+            <h3 style="font-size:21px;font-weight:800;color:#fff;margin:0 0 6px;letter-spacing:-.3px">See it on the map</h3>
+            <p style="font-size:14px;line-height:1.45;color:rgba(255,255,255,.82);margin:0">Every park pinned across Europe with real drive times from home.</p>
+          </div>
+        </div>
+        <div style="position:relative;height:300px;border-radius:16px;overflow:hidden;border:2.5px solid #1a1430;box-shadow:6px 6px 0 #1a1430">
+          <img src="https://images.unsplash.com/photo-1572853591097-89c78c5dd1e3?auto=format&fit=crop&w=1100&q=80" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+          <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,27,.86) 5%,rgba(18,18,27,.15) 60%)"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;padding:24px">
+            <div style="display:inline-flex;width:40px;height:40px;border-radius:11px;background:#1a1430;align-items:center;justify-content:center;margin-bottom:12px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2"><path d="M5 4h11l3 3v13H5z"></path><path d="M9 9h6M9 13h6M9 17h3"></path></svg>
+            </div>
+            <h3 style="font-size:21px;font-weight:800;color:#fff;margin:0 0 6px;letter-spacing:-.3px">Parent trail reports</h3>
+            <p style="font-size:14px;line-height:1.45;color:rgba(255,255,255,.82);margin:0">Videos and notes on which lines your kids can really handle.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURED PARKS -->
+    <section style="max-width:1240px;margin:0 auto;padding:48px 40px 16px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px">
+        <div>
+          <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#d6391f;margin-bottom:8px">Family favourites</div>
+          <h2 style="font-size:36px;font-weight:800;letter-spacing:-1px;margin:0">Where families love to ride</h2>
+        </div>
+        <a class="ls-link" href="/parks/" style="cursor:pointer;text-decoration:none;color:#1a1430;font-weight:700;font-size:15px;border-bottom:2px solid #ff5a4d;padding-bottom:2px">See all {parkCount} parks &rarr;</a>
+      </div>
+      <div class="ls-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+        {cards.map((p) => (
+          <a class="ls-card" href={p.href} style="display:block;text-decoration:none;color:inherit;cursor:pointer;background:#fff;border-radius:16px;overflow:hidden;border:2.5px solid #1a1430;box-shadow:6px 6px 0 #1a1430">
+            <div style="position:relative;height:196px">
+              <img src={p.img} alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+              {p.familyPick && (
+                <span style="position:absolute;top:12px;left:12px;background:#ff5a4d;color:#fff;font-size:12px;font-weight:800;padding:4px 11px;border-radius:999px;border:2px solid #1a1430">Family pick</span>
+              )}
+              <span style="position:absolute;top:12px;right:12px;background:#fbf4ea;color:#1a1430;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;border:2px solid #1a1430">★ {p.rating}</span>
+            </div>
+            <div style="padding:18px 20px 22px">
+              <h3 style="font-size:20px;font-weight:800;letter-spacing:-.3px;margin:0 0 4px" set:html={p.name}></h3>
+              <p style="font-size:13.5px;color:#7c7a72;margin:0 0 14px">{p.locShort} · {p.driveTime} from {homeBase}</p>
+              <p style="font-size:13.5px;color:#1a1430;margin:0"><span style="color:#7c7a72">Best for:</span> <span set:html={p.bestFor}></span></p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- CTA BAND -->
+    <section style="max-width:1240px;margin:0 auto;padding:48px 40px 72px">
+      <div style="position:relative;border:2.5px solid #1a1430;border-radius:16px;overflow:hidden;min-height:340px;box-shadow:6px 6px 0 #1a1430">
+        <img src="https://images.unsplash.com/photo-1466976141595-ef0f80f1dce1?auto=format&fit=crop&w=2200&q=80" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 35%" />
+        <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,90,77,.92) 0%,rgba(255,90,77,.55) 45%,rgba(18,18,27,.35) 100%)"></div>
+        <svg viewBox="0 0 1200 340" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;opacity:.18;pointer-events:none">
+          <g fill="none" stroke="#fff" stroke-width="2">
+            <path d="M-20 110 q220 -55 460 -18 t760 -32"></path>
+            <path d="M-20 150 q220 -55 460 -18 t760 -32"></path>
+            <path d="M-20 190 q220 -55 460 -18 t760 -32"></path>
+            <path d="M-20 230 q220 -55 460 -18 t760 -32"></path>
+          </g>
+        </svg>
+        <div style="position:absolute;bottom:36px;right:60px;z-index:2">
+          <Mascot bubble="See you up top!" size={120} variant="warm" />
+        </div>
+        <div style="position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;min-height:340px;padding:56px;max-width:640px">
+          <h2 style="font-size:42px;font-weight:800;letter-spacing:-1.2px;color:#fff;margin:0 0 14px;line-height:1.04">Plan your family's first send.</h2>
+          <p style="font-size:17px;color:rgba(255,255,255,.92);margin:0 0 26px;max-width:440px">Compare all {parkCount} parks, find the gentlest flow, and read what other parents really thought.</p>
+          <a href="/parks/" class="ls-btn" style="cursor:pointer;text-decoration:none;align-self:flex-start;display:inline-flex;align-items:center;height:54px;padding:0 30px;border-radius:14px;background:#fff;color:#1a1430;font-weight:800;font-size:16px;box-shadow:0 10px 26px rgba(0,0,0,.22)">Browse the parks</a>
+        </div>
+      </div>
+    </section>
+  </div>
 </BaseLayout>

@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import { Image } from 'astro:assets';
 import { getEntry } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
+import { parkImage } from '../lib/stockImages';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -12,7 +13,8 @@ const fm = post.data;
 const fmt = (d: Date) =>
   d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-// Resolve linked park references to { slug, name } for the back-links.
+// Resolve linked park references to { slug, name } for the "Bikeparks in this
+// post" chips. name is verbatim HTML (overview.name) -> rendered with set:html.
 const linked = await Promise.all(
   (fm.parks ?? []).map(async (ref) => {
     const e = await getEntry(ref);
@@ -20,33 +22,190 @@ const linked = await Promise.all(
   })
 );
 const parks = linked.filter((p): p is { slug: string; name: string } => p !== null);
+
+// Hero image: the post's own cover when present, else a deterministic stock
+// hero keyed off the post slug (the design always shows a framed hero).
+const heroAlt = fm.title;
+const stockHero = parkImage(post.id, 'hero');
+const metaParts = [fmt(fm.date), ...fm.tags];
 ---
 
 <BaseLayout title={fm.title} description={fm.description}>
-  <article class="article-body">
-    <p class="crumb"><a href="/blog/">Blog</a></p>
-    <header class="page-hero">
-      <h1>{fm.title}</h1>
-      <div class="post-meta">
-        {fmt(fm.date)}
-        {fm.tags.length > 0 && ' · '}
-        {fm.tags.map((t) => <span class="tag">{t}</span>)}
+  <section style="max-width:880px;margin:0 auto;padding:40px 40px 64px">
+    <a
+      class="ls-link"
+      href="/blog/"
+      style="display:inline-flex;align-items:center;gap:6px;color:#1a1430;font-weight:700;margin-bottom:20px;text-decoration:none"
+      >&larr; Back to all posts</a
+    >
+
+    <div
+      style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#d6391f;margin-bottom:10px"
+    >
+      Parent trail report
+    </div>
+    <h1 style="font-size:42px;font-weight:800;letter-spacing:-1.2px;margin:0 0 12px;line-height:1.05">
+      {fm.title}
+    </h1>
+    <p style="font-size:16px;color:#5d5a52;margin:0 0 28px">{metaParts.join(' · ')}</p>
+
+    <div
+      style="position:relative;border-radius:16px;overflow:hidden;height:400px;border:2.5px solid #1a1430;box-shadow:6px 6px 0 #1a1430;margin-bottom:14px"
+    >
+      {fm.cover ? (
+        <Image
+          src={fm.cover}
+          alt={heroAlt}
+          style="width:100%;height:100%;object-fit:cover;display:block"
+        />
+      ) : (
+        <img
+          src={stockHero}
+          alt={heroAlt}
+          loading="lazy"
+          style="width:100%;height:100%;object-fit:cover;display:block"
+        />
+      )}
+      <div
+        style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,27,.4),rgba(18,18,27,.05))"
+      >
       </div>
-    </header>
-    {fm.cover && <Image class="hero-img" src={fm.cover} alt={fm.title} />}
-    <slot />
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+        <span
+          class="ls-btn"
+          style="cursor:pointer;display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:999px;background:rgba(255,255,255,.92);box-shadow:0 8px 22px rgba(0,0,0,.3)"
+        >
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="#1a1430"><path d="M8 5v14l11-7z"></path></svg>
+        </span>
+      </div>
+      <span
+        style="position:absolute;bottom:14px;left:14px;background:rgba(18,18,27,.7);backdrop-filter:blur(6px);padding:5px 12px;border-radius:999px;color:#fff;font-size:12px"
+        >POV lap · drop your trail video here</span
+      >
+    </div>
+    {fm.description && (
+      <p style="font-size:12px;color:#6f6c64;margin:0 0 28px">{fm.description}</p>
+    )}
+
+    <div class="ls-prose">
+      <slot />
+    </div>
+
     {parks.length > 0 && (
-      <section class="related">
-        <h2 class="section-h">Bikeparks in this post</h2>
-        <ul class="post-list">
+      <section style="margin-top:44px">
+        <h2 style="font-size:24px;font-weight:800;letter-spacing:-.4px;margin:0 0 16px">
+          Bikeparks in this post
+        </h2>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
           {parks.map((p) => (
-            <li class="post-card">
-              <a class="post-title" href={`/parks/${p.slug}/`} set:html={p.name} />
-            </li>
+            <a
+              class="ls-chip"
+              href={`/parks/${p.slug}/`}
+              style="display:inline-flex;align-items:center;height:42px;padding:0 18px;border-radius:999px;background:#fff;border:2px solid #1a1430;color:#1a1430;font-weight:800;text-decoration:none"
+              set:html={p.name}
+            />
           ))}
-        </ul>
+        </div>
       </section>
     )}
-    <a class="back-link" href="/blog/">&larr; All posts</a>
-  </article>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:44px">
+      <a
+        href="/parks/"
+        class="ls-btn"
+        style="text-decoration:none;display:inline-flex;align-items:center;height:52px;padding:0 28px;border-radius:13px;background:#ff5a4d;color:#fff;font-weight:800"
+        >Browse all parks</a
+      >
+      <a
+        href="/blog/"
+        class="ls-btn"
+        style="text-decoration:none;display:inline-flex;align-items:center;height:52px;padding:0 26px;border-radius:13px;background:#fff;border:2px solid #1a1430;color:#1a1430;font-weight:800"
+        >Back to the blog</a
+      >
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  /* Readable measure + theme typography for the MDX <slot/> body. Scoped to
+     this layout; the design uses 18px/1.6 prose at ~760px max for the intro,
+     which we extend to the full post body. */
+  .ls-prose {
+    font-size: 18px;
+    line-height: 1.65;
+    color: #1a1430;
+    margin: 0 0 8px;
+  }
+  .ls-prose :global(p) {
+    margin: 0 0 22px;
+  }
+  .ls-prose :global(h2) {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+    margin: 36px 0 16px;
+  }
+  .ls-prose :global(h3) {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    margin: 28px 0 12px;
+  }
+  .ls-prose :global(a) {
+    color: #d6391f;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .ls-prose :global(a:hover) {
+    color: #ff5a4d;
+  }
+  .ls-prose :global(strong) {
+    font-weight: 800;
+  }
+  .ls-prose :global(ul),
+  .ls-prose :global(ol) {
+    margin: 0 0 22px;
+    padding-left: 24px;
+  }
+  .ls-prose :global(li) {
+    margin: 0 0 8px;
+  }
+  .ls-prose :global(blockquote) {
+    margin: 0 0 22px;
+    padding: 4px 0 4px 20px;
+    border-left: 4px solid #ff5a4d;
+    color: #5d5a52;
+    font-style: italic;
+  }
+  .ls-prose :global(img) {
+    max-width: 100%;
+    height: auto;
+    border: 2.5px solid #1a1430;
+    border-radius: 16px;
+    box-shadow: 6px 6px 0 #1a1430;
+    margin: 8px 0 28px;
+  }
+  .ls-prose :global(code) {
+    background: #fbf4ea;
+    border: 1px solid #f1ddcf;
+    border-radius: 6px;
+    padding: 1px 6px;
+    font-size: 15px;
+  }
+  .ls-prose :global(pre) {
+    background: #1a1430;
+    color: #fff3ec;
+    border-radius: 12px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin: 0 0 24px;
+  }
+  .ls-prose :global(pre code) {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+  }
+</style>

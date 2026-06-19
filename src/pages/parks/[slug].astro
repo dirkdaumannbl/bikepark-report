@@ -2,71 +2,292 @@
 import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import GroupSection from '../../components/GroupSection.astro';
-import SourceList from '../../components/SourceList.astro';
-import RelatedPosts from '../../components/RelatedPosts.astro';
-import Gallery from '../../components/Gallery.astro';
+import BikeparkMap from '../../components/BikeparkMap.astro';
+import { driveParts, diffCounts, ratingLabel } from '../../lib/parkDerive';
+import { parkImage, poolImage } from '../../lib/stockImages';
+import report from '../../../data/bikeparks.json';
 
 export async function getStaticPaths() {
   const parks = await getCollection('parks');
   return parks.map((entry) => ({
     params: { slug: entry.id },
-    props: { park: entry.data, slug: entry.id },
+    props: { park: entry, slug: entry.id },
   }));
 }
 
 const { park, slug } = Astro.props;
+const data = park.data;
+const ov = data.overview;
 
-// Editorial layer (optional): your photos + prose, matched by the `park` reference.
+// Editorial layer (optional): your photos + prose, matched by the park reference.
 const editorial = (await getCollection('parkContent')).find((e) => e.data.park.id === slug);
 const Editorial = editorial ? (await render(editorial)).Content : null;
 
-// Related blog posts (relation): posts that reference this park.
-const blogPosts = await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft);
-const related = blogPosts
-  .filter((p) => p.data.parks.some((r) => r.id === slug))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+// --- Hero / heading bits -------------------------------------------------
+const localName = data.local_name ?? ov.name;
+const segments = data.region_label.split(',').map((s) => s.trim()).filter(Boolean);
+const country = segments.length ? segments[segments.length - 1] : data.region_label;
+const homeBase = 'Berlin';
 
-const coords = park.coords;
+// --- Stat cards ----------------------------------------------------------
+const drive = driveParts(ov.cells.drive);
+const verticalM = ov.sort.vertical_m;
+const rating = ratingLabel(ov.sort.rating);
+const gravityCard = ov.sort.gravity_card === 1;
+
+// --- Difficulty spread ---------------------------------------------------
+const diff = diffCounts(park);
+const trailTotal = diff.green + diff.blue + diff.red + diff.black;
+// Some parks carry the difficulty colours as presence-only badges with no
+// counts (trailTotal === 0 even though colours exist). When we have real
+// counts, bar widths are proportional; otherwise fall back to a full bar for
+// every PRESENT colour so the spread still reads as "these colours exist".
+const hasCounts = trailTotal > 0;
+const barPct = (n: number, present: boolean): string => {
+  if (hasCounts) return `${Math.round((n / trailTotal) * 100)}%`;
+  return present ? '100%' : '0%';
+};
+const diffPct = {
+  green: barPct(diff.green, diff.present.green),
+  blue: barPct(diff.blue, diff.present.blue),
+  red: barPct(diff.red, diff.present.red),
+  black: barPct(diff.black, diff.present.black),
+};
+// Display value next to each bar: the count when known, a check when the colour
+// is present-but-uncounted, blank when absent.
+const diffMark = (n: number, present: boolean): string =>
+  n > 0 ? String(n) : present ? '✓' : '—';
+
+// --- Family layer (all optional; render only when present) ---------------
+const minAge = data.min_age;
+const familyFlags = data.family_flags ?? [];
+const hasFamilyData = minAge != null || familyFlags.length > 0;
+
+// --- Editorial / trip-notes sections (render only when data exists) ------
+const trailSpotlights = data.trail_spotlights ?? [];
+const parentNotes = data.parent_notes ?? [];
+const blogIntro = data.blog_intro ?? null;
+const hasTripIntro = blogIntro != null || Editorial != null;
+
+// "From the trails" gallery: editorial photos if present, else 3 stock pool images.
+const editorialGallery = editorial?.data.gallery ?? [];
+const stockGallery = [0, 1, 2].map((i) => poolImage(park.data.parkNo + i));
+
+// --- Map -----------------------------------------------------------------
+const coords = data.coords ?? null;
+const pins = coords
+  ? [{ name: data.pin_name ?? ov.name, region: data.region_label, lat: coords.lat, lng: coords.lng }]
+  : [];
+const home = report.home;
 const mapsUrl = coords
   ? `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`
   : null;
+
+// --- Facts grid (the 4 groups) -------------------------------------------
+const factGroups = data.groups.map((g) => ({
+  title: g.title,
+  rows: g.rows.map((r) => ({ k: r.label, v: r.html })),
+}));
+
+// --- Sources / official-site button --------------------------------------
+const sources = data.sources ?? [];
+// "Official site" = a source whose TITLE reads like the operator's own site,
+// or whose URL host clearly names a bike/trail park or resort. Kept conservative
+// so news/wiki/maps citations don't get promoted to the primary CTA.
+const OFFICIAL_TITLE_RE = /(official|operator|home\s*page|bike\s*park|bikepark|trailpark|resort)/i;
+const OFFICIAL_HOST_RE = /(bikepark|trailpark|resort)/i;
+const officialSource =
+  sources.find((s) => OFFICIAL_TITLE_RE.test(s.title)) ??
+  sources.find((s) => OFFICIAL_HOST_RE.test(s.url));
 ---
 
 <BaseLayout
-  title={park.overview.name}
-  description={`Researched, sourced facts for ${park.overview.name} — ${park.region_label}.`}
+  title={ov.name}
+  description={`Researched, sourced facts for ${ov.name} — ${data.region_label}.`}
 >
-  <p class="crumb"><a href="/parks/">Parks</a></p>
-  <article>
-    <header class="page-hero">
-      <h1 set:html={park.name} />
-      <p class="pk-region">{park.region_label}</p>
-      {mapsUrl && (
-        <a class="map-link" href={mapsUrl} target="_blank" rel="noopener">View on Google Maps &rarr;</a>
-      )}
-    </header>
-
-    {editorial?.data.heroImage && (
-      <Image
-        class="hero-img"
-        src={editorial.data.heroImage}
-        alt={editorial.data.heroAlt ?? park.overview.name}
+  <div>
+    <!-- ===================== HERO ===================== -->
+    <section style="position:relative;min-height:400px;overflow:hidden;background:#1a1430">
+      <img
+        src={parkImage(slug, 'hero')}
+        alt={ov.name}
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"
+        loading="eager"
       />
-    )}
-    {Editorial && (
-      <section class="editorial">
-        <Editorial />
-      </section>
-    )}
-    {editorial && editorial.data.gallery.length > 0 && <Gallery images={editorial.data.gallery} />}
+      <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,27,.9) 0%,rgba(18,18,27,.4) 55%,rgba(18,18,27,.55) 100%)"></div>
+      <div style="position:relative;max-width:1100px;margin:0 auto;padding:36px 40px 44px">
+        <a class="ls-link" href="/parks/" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.92);font-weight:700;margin-bottom:120px;text-decoration:none">&larr; Back to all parks</a>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-top:80px">
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ffb38f;margin-bottom:10px">{country} &middot; {localName}</div>
+            <h1 class="ls-h1-detail" style="font-size:52px;font-weight:800;letter-spacing:-1.6px;color:#fff;margin:0 0 12px;line-height:1.02" set:html={data.name} />
+            {data.tagline && (
+              <p style="font-size:18px;line-height:1.5;color:rgba(255,255,255,.9);max-width:580px;margin:0">{data.tagline}</p>
+            )}
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <span style="background:rgba(255,255,255,.16);backdrop-filter:blur(8px);color:#fff;padding:9px 15px;border-radius:999px;font-weight:800">&#9733; {rating} / 5</span>
+            {gravityCard && (
+              <span style="background:#1a1430;color:#fff;padding:9px 15px;border-radius:999px;font-weight:800;font-size:14px">Gravity Card</span>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
 
-    {park.groups.map((g) => <GroupSection group={g} />)}
+    <section style="max-width:1100px;margin:0 auto;padding:36px 40px 0">
+      <!-- ===================== STAT CARDS ===================== -->
+      <h2 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0">At a glance</h2>
+      <div class="ls-grid-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px">
+        <div style="background:#fff;border-radius:16px;padding:20px;border:2px solid #1a1430;box-shadow:4px 4px 0 #1a1430"><div style="font-size:12px;color:#6f6c64;margin-bottom:6px">Drive from {homeBase}</div><div style="font-size:21px;font-weight:800;letter-spacing:-.3px">{drive.kmLabel}</div><div style="font-size:13.5px;color:#7c7a72">{drive.time}</div></div>
+        <div style="background:#fff;border-radius:16px;padding:20px;border:2px solid #1a1430;box-shadow:4px 4px 0 #1a1430"><div style="font-size:12px;color:#6f6c64;margin-bottom:6px">Lift</div><div style="font-size:19px;font-weight:800;letter-spacing:-.3px" set:html={ov.cells.lift} /></div>
+        <div style="background:#fff;border-radius:16px;padding:20px;border:2px solid #1a1430;box-shadow:4px 4px 0 #1a1430"><div style="font-size:12px;color:#6f6c64;margin-bottom:6px">Vertical drop</div><div style="font-size:21px;font-weight:800;letter-spacing:-.3px">{verticalM != null ? `~${verticalM} m` : '—'}</div></div>
+        {data.season && (
+          <div style="background:#fff;border-radius:16px;padding:20px;border:2px solid #1a1430;box-shadow:4px 4px 0 #1a1430"><div style="font-size:12px;color:#6f6c64;margin-bottom:6px">Season</div><div style="font-size:19px;font-weight:800;letter-spacing:-.3px">{data.season}</div></div>
+        )}
+      </div>
 
-    <SourceList parkNo={park.parkNo} sources={park.sources} />
+      <!-- ===================== DIFFICULTY + FAMILY ===================== -->
+      <div class="ls-grid-2-wide" style="display:grid;grid-template-columns:1.3fr 1fr;gap:24px;margin-bottom:40px">
+        <div style="background:#fff;border-radius:16px;padding:26px;border:2px solid #1a1430;box-shadow:4px 4px 0 #1a1430">
+          <h3 style="font-size:21px;font-weight:800;letter-spacing:-.3px;margin:0 0 6px">Difficulty spread</h3>
+          <p style="font-size:13.5px;color:#7c7a72;margin:0 0 20px">{hasCounts ? `How the ${trailTotal} marked trails break down by colour.` : 'Trail difficulty colours found at this park.'}</p>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:12px"><span style="width:14px;height:14px;border-radius:999px;background:#1f8a4c;flex:none"></span><span style="width:60px;font-weight:600">Green</span><div style="flex:1;height:10px;border-radius:999px;background:#efeadd;overflow:hidden"><div style={`height:100%;width:${diffPct.green};background:#1f8a4c`}></div></div><span style="width:24px;text-align:right;font-weight:800">{diffMark(diff.green, diff.present.green)}</span></div>
+            <div style="display:flex;align-items:center;gap:12px"><span style="width:14px;height:14px;border-radius:999px;background:#2c72d2;flex:none"></span><span style="width:60px;font-weight:600">Blue</span><div style="flex:1;height:10px;border-radius:999px;background:#efeadd;overflow:hidden"><div style={`height:100%;width:${diffPct.blue};background:#2c72d2`}></div></div><span style="width:24px;text-align:right;font-weight:800">{diffMark(diff.blue, diff.present.blue)}</span></div>
+            <div style="display:flex;align-items:center;gap:12px"><span style="width:14px;height:14px;border-radius:999px;background:#d23b3b;flex:none"></span><span style="width:60px;font-weight:600">Red</span><div style="flex:1;height:10px;border-radius:999px;background:#efeadd;overflow:hidden"><div style={`height:100%;width:${diffPct.red};background:#d23b3b`}></div></div><span style="width:24px;text-align:right;font-weight:800">{diffMark(diff.red, diff.present.red)}</span></div>
+            <div style="display:flex;align-items:center;gap:12px"><span style="width:14px;height:14px;border-radius:999px;background:#1a1a1a;flex:none"></span><span style="width:60px;font-weight:600">Black</span><div style="flex:1;height:10px;border-radius:999px;background:#efeadd;overflow:hidden"><div style={`height:100%;width:${diffPct.black};background:#1a1a1a`}></div></div><span style="width:24px;text-align:right;font-weight:800">{diffMark(diff.black, diff.present.black)}</span></div>
+          </div>
+          <p style="font-size:15px;margin:22px 0 0;padding-top:18px;border-top:1px solid #f0ebe0"><span style="color:#7c7a72">Best for:</span> <span style="font-weight:700" set:html={ov.cells.best_for} /></p>
+        </div>
+        <div style="background:#fff;border-radius:16px;padding:26px;border:2px solid #1a1430;box-shadow:4px 4px 0 #1a1430">
+          <h3 style="font-size:21px;font-weight:800;letter-spacing:-.3px;margin:0 0 18px">For families</h3>
+          {hasFamilyData ? (
+            <div style="display:flex;flex-direction:column;gap:14px">
+              {minAge != null && (
+                <div style="display:flex;align-items:center;gap:10px"><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;background:#e4f6ec;color:#1f8a4c;font-weight:800;flex:none">&#10003;</span><span style="font-size:15px">Riders from age <strong>{minAge}</strong></span></div>
+              )}
+              {familyFlags.map((f) => (
+                <div style="display:flex;align-items:center;gap:10px"><span style={`display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;background:${f.ok ? '#e4f6ec' : '#fde6e3'};color:${f.ok ? '#1f8a4c' : '#d23b3b'};font-weight:800;flex:none`}>{f.ok ? '✓' : '✗'}</span><span style={`font-size:15px;color:${f.ok ? '#1a1430' : '#7c7a72'}`}>{f.label}</span></div>
+              ))}
+            </div>
+          ) : (
+            <p style="font-size:15px;line-height:1.55;color:#7c7a72;margin:0">We haven&rsquo;t gathered family-specific notes for this park yet. Check the operator&rsquo;s site for age limits, rental gear and kids&rsquo; coaching before you go.</p>
+          )}
+        </div>
+      </div>
 
-    {related.length > 0 && <RelatedPosts posts={related} heading="Posts about this park" />}
+      <!-- ===================== WHERE IT IS (real map) ===================== -->
+      <h2 style="font-size:26px;font-weight:800;letter-spacing:-.5px;text-transform:uppercase;margin:8px 0 16px">Where it is</h2>
+      <div style="margin-bottom:14px">
+        <BikeparkMap pins={pins} home={home} />
+      </div>
+      {mapsUrl && (
+        <a href={mapsUrl} target="_blank" rel="noopener" style="text-decoration:none;color:#d6391f;font-weight:800;font-size:15px">View on Google Maps &rarr;</a>
+      )}
+      <div style="height:44px"></div>
 
-    <a class="back-link" href="/parks/">&larr; All parks</a>
-  </article>
+      <!-- ===================== TRIP NOTES (editorial) ===================== -->
+      {hasTripIntro && (
+        <>
+          <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#d6391f;margin-bottom:10px">Trip notes</div>
+          <h2 style="font-size:30px;font-weight:800;letter-spacing:-.7px;text-transform:uppercase;margin:0 0 20px">Is it right for your kids?</h2>
+          {blogIntro ? (
+            <p style="font-size:18px;line-height:1.6;margin:0 0 28px;max-width:760px">{blogIntro}</p>
+          ) : (
+            Editorial && <div style="font-size:18px;line-height:1.6;margin:0 0 28px;max-width:760px"><Editorial /></div>
+          )}
+        </>
+      )}
+
+      <!-- ===================== TRAILS TO KNOW ===================== -->
+      {trailSpotlights.length > 0 && (
+        <>
+          <h3 style="font-size:21px;font-weight:800;letter-spacing:-.3px;margin:8px 0 16px">Trails to know</h3>
+          <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:32px">
+            {trailSpotlights.map((t, i) => (
+              <div class="ls-spotlight" style="display:flex;gap:18px;background:#fff;border-radius:16px;overflow:hidden;border:2px solid #1a1430;box-shadow:4px 4px 0 #1a1430">
+                <div class="ls-spotlight-img" style="position:relative;width:190px;flex:none">
+                  <img src={poolImage(park.data.parkNo + i)} alt={t.name} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" loading="lazy" />
+                  <div style="position:absolute;inset:0;background:rgba(18,18,27,.18);display:flex;align-items:center;justify-content:center"><span style="display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:999px;background:rgba(255,255,255,.9)"><svg width="16" height="16" viewBox="0 0 24 24" fill="#1a1430"><path d="M8 5v14l11-7z"/></svg></span></div>
+                </div>
+                <div style="padding:18px 20px 18px 0;flex:1">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span style={`width:12px;height:12px;border-radius:999px;background:${({ green: '#1f8a4c', blue: '#2c72d2', red: '#d23b3b', black: '#1a1a1a' }[t.color ?? 'blue'])}`}></span><h4 style="font-size:18px;font-weight:800;margin:0">{t.name}</h4>{t.length && <span style="font-size:12px;color:#6f6c64">&middot; {t.length}</span>}</div>
+                  <p style="font-size:15px;line-height:1.5;color:#5d5a52;margin:0">{t.note}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <!-- ===================== GOOD TO KNOW FOR PARENTS ===================== -->
+      {parentNotes.length > 0 && (
+        <div style="background:#eaf6ff;border:2px solid #1a1430;border-radius:16px;box-shadow:4px 4px 0 #1a1430;padding:28px 30px;margin-bottom:32px">
+          <h3 style="font-size:21px;font-weight:800;letter-spacing:-.3px;margin:0 0 18px">Good to know for parents</h3>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            {parentNotes.map((n) => (
+              <div style="display:flex;gap:12px"><span style="color:#ff5a4d;font-weight:800;flex:none;font-size:18px;line-height:1.3">&bull;</span><span style="font-size:15.5px;line-height:1.5">{n}</span></div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- ===================== FROM THE TRAILS (gallery) ===================== -->
+      <h3 style="font-size:21px;font-weight:800;letter-spacing:-.3px;margin:0 0 16px">From the trails</h3>
+      <div class="ls-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:44px">
+        {editorialGallery.length > 0
+          ? editorialGallery.map((g) => (
+              <div style="position:relative;aspect-ratio:1/1;border:2px solid #1a1430;border-radius:12px;overflow:hidden;box-shadow:4px 4px 0 #1a1430">
+                <Image src={g.src} alt={g.alt} widths={[220, 440, 660]} sizes="(max-width:620px) 100vw, 300px" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+                {g.alt && <span style="position:absolute;bottom:8px;left:8px;background:rgba(18,18,27,.7);backdrop-filter:blur(6px);padding:3px 9px;border-radius:999px;color:#fff;font-size:11px;font-weight:600">{g.alt}</span>}
+              </div>
+            ))
+          : stockGallery.map((src) => (
+              <div style="position:relative;aspect-ratio:1/1;border:2px solid #1a1430;border-radius:12px;overflow:hidden;box-shadow:4px 4px 0 #1a1430">
+                <img src={src} alt={ov.name} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" loading="lazy" />
+                <span style="position:absolute;bottom:8px;left:8px;background:rgba(18,18,27,.7);backdrop-filter:blur(6px);padding:3px 9px;border-radius:999px;color:#fff;font-size:11px;font-weight:600">{ov.name}</span>
+              </div>
+            ))}
+      </div>
+
+      <!-- ===================== THE FACTS ===================== -->
+      <h2 style="font-size:30px;font-weight:800;letter-spacing:-.7px;text-transform:uppercase;margin:0 0 18px">The facts</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:36px">
+        {factGroups.map((grp) => (
+          <div style="background:#fff;border:2px solid #1a1430;border-radius:16px;box-shadow:4px 4px 0 #1a1430;overflow:hidden">
+            <div style="background:#1a1430;color:#fff;font-size:12px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:11px 18px" set:html={grp.title} />
+            <div style="padding:4px 18px 14px">
+              {grp.rows.map((r) => (
+                <div style="display:flex;justify-content:space-between;gap:18px;padding:11px 0;border-bottom:1px solid #f0ebe0"><span style="font-size:13px;color:#7c7a72;flex:none">{r.k}</span><span style="font-size:13.5px;font-weight:600;text-align:right" set:html={r.v} /></div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <p style="font-size:12px;color:#6f6c64;margin:0 0 24px;max-width:760px">Facts compiled from official sources &mdash; verify season, pricing and lift status on the operator&rsquo;s site before you travel.</p>
+
+      <!-- ===================== SOURCES ===================== -->
+      {sources.length > 0 && (
+        <div style="margin-bottom:28px">
+          <h3 style="font-size:14px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:#7c7a72;margin:0 0 12px">Sources</h3>
+          <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px">
+            {sources.map((s) => (
+              <li id={`p${park.data.parkNo}-s${s.n}`} style="font-size:13px;color:#5d5a52;line-height:1.5">
+                <a class="ls-link" href={s.url} target="_blank" rel="noopener" style="color:#d6391f;font-weight:600;text-decoration:none">{s.title}</a>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      <!-- ===================== CTA BUTTONS ===================== -->
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px">
+        {officialSource && (
+          <a href={officialSource.url} target="_blank" rel="noopener" class="ls-btn" style="text-decoration:none;display:inline-flex;align-items:center;height:52px;padding:0 28px;border-radius:13px;background:#ff5a4d;color:#fff;font-weight:800">Official site &nearr;</a>
+        )}
+        <a href="/parks/" class="ls-btn" style="cursor:pointer;display:inline-flex;align-items:center;height:52px;padding:0 26px;border-radius:13px;background:#fff;border:2px solid #1a1430;font-weight:800;text-decoration:none;color:#1a1430">Compare other parks</a>
+      </div>
+    </section>
+  </div>
 </BaseLayout>

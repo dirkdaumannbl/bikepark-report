@@ -1,34 +1,159 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Mascot from '../components/Mascot.astro';
+
 const parks = await getCollection('parks');
+const parkCount = parks.length;
+
+/**
+ * No design slice exists for /about — this page is styled to the LittleShredder
+ * theme by reusing the design's conventions: the blog hero treatment (eyebrow +
+ * UPPERCASE h1 + lede), neo-brutalist framed cards, and the warm info card
+ * (#eaf6ff) from the "Good to know for parents" block. The methodology and
+ * sourcing copy below is preserved verbatim from the original About page.
+ */
+
+// Methodology / sourcing sections (content preserved from the original page).
+const sections = [
+  {
+    title: 'How the research works',
+    body: `Every park is researched against a fixed criteria set and compiled by a dedicated research agent. The structured data drives the comparison table, the map, and each park page.`,
+  },
+  {
+    title: 'Sourcing',
+    bodyHtml: `Every factual value links to at least one source — the operator's site is preferred, with independent directories and reviews used to cross-check. Anything that could not be verified is marked <span style="display:inline-block;background:#efeadd;color:#8b887f;font-size:12px;font-weight:800;padding:2px 9px;border-radius:7px">Not found</span> rather than guessed.`,
+  },
+  {
+    title: 'Driving distances',
+    body: `Distances and times are computed via the Google Maps Directions API from Oskar-Helene-Park 7, 14195 Berlin. Confirm season and pricing on the operator's site before travelling.`,
+  },
+];
 ---
 
-<BaseLayout title="About" description="About the Bikepark Report — methodology and sourcing.">
-  <header class="page-hero"><h1>About</h1></header>
-  <div class="article-body">
-    <p>
-      The Bikepark Report is a researched, fully-sourced comparison of {parks.length} gravity and
-      downhill mountain-bike parks reachable by car from Berlin. Each park has its own page with the
-      facts that matter for planning a trip — lift, season, difficulty spread, vertical, skills
-      areas, family-friendliness, and more — plus space for first-hand notes and photos.
-    </p>
-    <h2>How the research works</h2>
-    <p>
-      Every park is researched against a fixed criteria set and compiled by a dedicated research
-      agent. The structured data drives the comparison table, the map, and each park page.
-    </p>
-    <h2>Sourcing</h2>
-    <p>
-      Every factual value links to at least one source — the operator's site is preferred, with
-      independent directories and reviews used to cross-check. Anything that could not be verified
-      is marked <span class="nf">Not found</span> rather than guessed.
-    </p>
-    <h2>Driving distances</h2>
-    <p>
-      Distances and times are computed via the Google Maps Directions API from
-      Oskar-Helene-Park 7, 14195 Berlin. Confirm season and pricing on the operator's site before
-      travelling.
-    </p>
-  </div>
+<BaseLayout title="About" description="About LittleShredder — methodology and sourcing.">
+  <!-- HERO -->
+  <section style="position:relative;overflow:hidden;background:#1a1430">
+    <img
+      src="https://images.unsplash.com/photo-1572854875376-d4c543b06ea8?auto=format&fit=crop&w=2200&q=80"
+      alt=""
+      style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 40%"
+    />
+    <div
+      style="position:absolute;inset:0;background:linear-gradient(95deg,rgba(18,18,27,.9) 0%,rgba(18,18,27,.62) 48%,rgba(18,18,27,.2) 100%)"
+    >
+    </div>
+    <svg
+      viewBox="0 0 1200 360"
+      preserveAspectRatio="none"
+      style="position:absolute;inset:0;width:100%;height:100%;opacity:.2;pointer-events:none"
+    >
+      <g fill="none" stroke="#ff5a4d" stroke-width="2">
+        <path d="M-20 250 q220 -70 460 -24 t760 -44"></path>
+        <path d="M-20 290 q220 -70 460 -24 t760 -44"></path>
+        <path d="M-20 330 q220 -70 460 -24 t760 -44"></path>
+      </g>
+    </svg>
+    <div style="position:relative;max-width:1240px;margin:0 auto;padding:72px 40px 64px">
+      <div style="max-width:620px">
+        <div
+          style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:7px 14px;border-radius:999px;margin-bottom:22px"
+        >
+          <span style="width:8px;height:8px;border-radius:999px;background:#ff5a4d"></span>About this guide
+        </div>
+        <h1
+          style="font-weight:900;font-size:54px;line-height:.98;letter-spacing:-1.8px;text-transform:uppercase;color:#fff;margin:0 0 18px;text-wrap:balance"
+        >
+          Parent-first, fully sourced.
+        </h1>
+        <p style="font-size:18px;line-height:1.55;color:rgba(255,255,255,.88);margin:0;max-width:520px">
+          LittleShredder is a researched, fully-sourced comparison of {parkCount} gravity and downhill
+          mountain-bike parks reachable by car from Berlin. Each park has its own page with the facts
+          that matter for planning a trip — lift, season, difficulty spread, vertical, skills areas,
+          family-friendliness, and more — plus space for first-hand notes and photos.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARTICLE BODY -->
+  <section style="max-width:880px;margin:0 auto;padding:56px 40px 24px">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      {
+        sections.map((s) => (
+          <article
+            class="ls-frame"
+            style="padding:26px 30px;background:#fff"
+          >
+            <h2 style="font-size:24px;font-weight:800;letter-spacing:-.5px;margin:0 0 12px">
+              {s.title}
+            </h2>
+            {s.bodyHtml ? (
+              <p
+                style="font-size:16px;line-height:1.6;color:#5d5a52;margin:0"
+                set:html={s.bodyHtml}
+              />
+            ) : (
+              <p style="font-size:16px;line-height:1.6;color:#5d5a52;margin:0">{s.body}</p>
+            )}
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- PHOTOS NOTE + MASCOT -->
+  <section style="max-width:880px;margin:0 auto;padding:24px 40px 72px">
+    <div
+      style="position:relative;background:#eaf6ff;border:2.5px solid #1a1430;border-radius:16px;box-shadow:6px 6px 0 #1a1430;padding:30px 32px;overflow:hidden"
+    >
+      <div style="max-width:560px">
+        <div
+          style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#d6391f;margin-bottom:10px"
+        >
+          About the photos
+        </div>
+        <h2 style="font-size:24px;font-weight:800;letter-spacing:-.4px;margin:0 0 12px">
+          Placeholders, for now
+        </h2>
+        <p style="font-size:15.5px;line-height:1.55;color:#1a1430;margin:0">
+          Photos across the site are placeholders from Unsplash to set the mood — each is a drop-in
+          slot for your own trail shots. This is an independent family guide; always confirm ages,
+          lift status and prices before you travel.
+        </p>
+      </div>
+      <div style="position:absolute;bottom:18px;right:40px;display:none" data-mascot-anchor>
+        <Mascot bubble="Always check before you ride!" caption="I'm Rocco" size={120} variant="warm" />
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="max-width:880px;margin:0 auto;padding:0 40px 80px">
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <a
+        href="/parks/"
+        class="ls-btn"
+        style="cursor:pointer;display:inline-flex;align-items:center;height:52px;padding:0 28px;border-radius:13px;background:#ff5a4d;color:#fff;font-weight:800;text-decoration:none"
+      >
+        Browse the parks
+      </a>
+      <a
+        href="/blog/"
+        class="ls-btn"
+        style="cursor:pointer;display:inline-flex;align-items:center;height:52px;padding:0 26px;border-radius:13px;background:#fff;border:2px solid #1a1430;color:#1a1430;font-weight:800;text-decoration:none"
+      >
+        Read parent trail reports
+      </a>
+    </div>
+  </section>
+
+  <style>
+    /* Show the mascot only on wide viewports where it won't crowd the text. */
+    @media (min-width: 900px) {
+      [data-mascot-anchor] {
+        display: block !important;
+      }
+    }
+  </style>
 </BaseLayout>

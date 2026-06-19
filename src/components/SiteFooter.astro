@@ -1,7 +1,28 @@
 ---
+/**
+ * Themed footer (design lines 511–520): brand mark + the "verify season &
+ * pricing" disclaimer.
+ */
 ---
 
-<footer>
-  Compiled by the bikepark-researcher agent · facts sourced as of the noted dates —
-  verify season &amp; pricing on the operator's site before travel.
+<footer style="border-top:1px solid #f1ddcf;background:#fff3ec;margin-top:8px">
+  <div
+    style="max-width:1240px;margin:0 auto;padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px"
+  >
+    <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit">
+      <svg width="28" height="26" viewBox="0 0 220 200">
+        <circle cx="108" cy="92" r="70" fill="#ff5a4d"></circle>
+        <path d="M58 100 q10 40 50 40 q42 0 50 -40 q-26 14 -50 14 q-28 0 -50 -14 z" fill="#fff3ec"></path>
+        <rect x="56" y="60" width="104" height="40" rx="20" fill="#1a1430"></rect>
+        <rect x="64" y="67" width="34" height="13" rx="6.5" fill="#1fb6a6"></rect>
+        <path d="M46 64 q62 -36 126 -4 q-7 -18 -30 -25 q-42 -12 -78 4 q-15 9 -18 25 z" fill="#1a1430"></path>
+      </svg>
+      <span style="font-size:17px;font-weight:800">LittleShredder</span>
+    </a>
+    <p style="font-size:12.5px;color:#8b887f;max-width:520px;margin:0">
+      Photos are placeholders from Unsplash to set the mood — each is a drop-in slot for your own
+      trail shots. Independent family guide; always confirm ages, lift status and prices before you
+      travel.
+    </p>
+  </div>
 </footer>
