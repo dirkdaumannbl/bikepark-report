@@ -9,7 +9,9 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Mascot from '../components/Mascot.astro';
+import PhotoCredit from '../components/PhotoCredit.astro';
 import { parkImage } from '../lib/stockImages';
+import { heroPhoto } from '../lib/photos';
 import { driveParts, ratingLabel } from '../lib/parkDerive';
 
 const parks = await getCollection('parks');
@@ -37,9 +39,12 @@ const cards = featured.map((p) => {
   const country = segs[segs.length - 1] ?? '';
   const locShort = country && country !== city ? `${city}, ${country}` : city;
   const { time } = driveParts(p.data.overview.cells.drive);
+  // Prefer the park's real CC photo; credit it. Fall back to the stock card image.
+  const photo = heroPhoto(p);
   return {
     href: `/parks/${p.id}/`,
-    img: parkImage(p.id, 'card'),
+    img: photo?.url ?? parkImage(p.id, 'card'),
+    photo, // ParkPhoto | null — present => render a compact credit, no credit on stock
     familyPick: p.data.family_pick === true,
     rating: ratingLabel(p.data.overview.sort.rating),
     name: p.data.overview.name, // HTML -> set:html
@@ -149,11 +154,12 @@ const cards = featured.map((p) => {
         {cards.map((p) => (
           <a class="ls-card" href={p.href} style="display:block;text-decoration:none;color:inherit;cursor:pointer;background:#fff;border-radius:16px;overflow:hidden;border:2.5px solid #1a1430;box-shadow:6px 6px 0 #1a1430">
             <div style="position:relative;height:196px">
-              <img src={p.img} alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+              <img src={p.img} alt={p.photo?.alt ?? ''} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
               {p.familyPick && (
                 <span style="position:absolute;top:12px;left:12px;background:#ff5a4d;color:#fff;font-size:12px;font-weight:800;padding:4px 11px;border-radius:999px;border:2px solid #1a1430">Family pick</span>
               )}
               <span style="position:absolute;top:12px;right:12px;background:#fbf4ea;color:#1a1430;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;border:2px solid #1a1430">★ {p.rating}</span>
+              {p.photo && <PhotoCredit attribution={p.photo.attribution} source={p.photo.source} compact />}
             </div>
             <div style="padding:18px 20px 22px">
               <h3 style="font-size:20px;font-weight:800;letter-spacing:-.3px;margin:0 0 4px" set:html={p.name}></h3>

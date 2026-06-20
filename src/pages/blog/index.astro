@@ -1,7 +1,9 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PhotoCredit from '../../components/PhotoCredit.astro';
+import { heroPhoto } from '../../lib/photos';
 import { parkImage } from '../../lib/stockImages';
 
 const posts = (await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft)).sort(
@@ -9,6 +11,18 @@ const posts = (await getCollection('blog', ({ data }) => import.meta.env.DEV || 
 );
 const fmt = (d: Date) =>
   d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+// For each post without its own cover, resolve the first linked park's real CC
+// photo (credited) to use as the card image. Keyed by post id; null when none.
+const postHero = new Map(
+  await Promise.all(
+    posts.map(async (p) => {
+      const firstRef = (p.data.parks ?? [])[0];
+      const entry = firstRef ? await getEntry(firstRef) : null;
+      return [p.id, entry ? heroPhoto(entry) : null] as const;
+    })
+  )
+);
 ---
 
 <BaseLayout
@@ -34,6 +48,7 @@ const fmt = (d: Date) =>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px">
         {posts.map((p) => {
           const meta = [fmt(p.data.date), ...p.data.tags];
+          const hero = postHero.get(p.id) ?? null;
           return (
             <a
               class="ls-card"
@@ -45,6 +60,13 @@ const fmt = (d: Date) =>
                   <Image
                     src={p.data.cover}
                     alt={p.data.title}
+                    style="width:100%;height:100%;object-fit:cover;display:block"
+                  />
+                ) : hero ? (
+                  <img
+                    src={hero.url}
+                    alt={hero.alt}
+                    loading="lazy"
                     style="width:100%;height:100%;object-fit:cover;display:block"
                   />
                 ) : (
@@ -59,6 +81,9 @@ const fmt = (d: Date) =>
                   style="position:absolute;top:12px;left:12px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;background:rgba(18,18,27,.7);backdrop-filter:blur(6px);padding:4px 11px;border-radius:999px"
                   >Parent trail report</span
                 >
+                {!p.data.cover && hero && (
+                  <PhotoCredit attribution={hero.attribution} source={hero.source} compact />
+                )}
               </div>
               <div style="padding:20px 22px 22px;display:flex;flex-direction:column;flex:1">
                 <h2 style="font-size:21px;font-weight:800;letter-spacing:-.4px;line-height:1.15;margin:0 0 10px">

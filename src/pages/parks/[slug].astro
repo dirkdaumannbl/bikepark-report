@@ -3,7 +3,9 @@ import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BikeparkMap from '../../components/BikeparkMap.astro';
+import PhotoCredit from '../../components/PhotoCredit.astro';
 import { driveParts, diffCounts, ratingLabel } from '../../lib/parkDerive';
+import { heroPhoto, galleryPhotos } from '../../lib/photos';
 import { parkImage, poolImage } from '../../lib/stockImages';
 import report from '../../../data/bikeparks.json';
 
@@ -22,6 +24,13 @@ const ov = data.overview;
 // Editorial layer (optional): your photos + prose, matched by the park reference.
 const editorial = (await getCollection('parkContent')).find((e) => e.data.park.id === slug);
 const Editorial = editorial ? (await render(editorial)).Content : null;
+
+// --- Real CC photos (preferred over stock) -------------------------------
+// `hero` is the park's first openly-licensed photo (null when none); when set
+// it replaces the stock hero and gets a visible <PhotoCredit>.
+const hero = heroPhoto(park);
+const heroSrc = hero?.url ?? parkImage(slug, 'hero');
+const heroImgAlt = hero?.alt ?? ov.name;
 
 // --- Hero / heading bits -------------------------------------------------
 const localName = data.local_name ?? ov.name;
@@ -69,7 +78,9 @@ const parentNotes = data.parent_notes ?? [];
 const blogIntro = data.blog_intro ?? null;
 const hasTripIntro = blogIntro != null || Editorial != null;
 
-// "From the trails" gallery: editorial photos if present, else 3 stock pool images.
+// "From the trails" gallery: prefer the real CC photos (up to 6, each credited),
+// else the editorial MDX photos, else 3 stock pool images.
+const photoGallery = galleryPhotos(park).slice(0, 6);
 const editorialGallery = editorial?.data.gallery ?? [];
 const stockGallery = [0, 1, 2].map((i) => poolImage(park.data.parkNo + i));
 
@@ -109,12 +120,13 @@ const officialSource =
     <!-- ===================== HERO ===================== -->
     <section style="position:relative;min-height:400px;overflow:hidden;background:#1a1430">
       <img
-        src={parkImage(slug, 'hero')}
-        alt={ov.name}
+        src={heroSrc}
+        alt={heroImgAlt}
         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"
         loading="eager"
       />
       <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,27,.9) 0%,rgba(18,18,27,.4) 55%,rgba(18,18,27,.55) 100%)"></div>
+      {hero && <PhotoCredit attribution={hero.attribution} source={hero.source} />}
       <div style="position:relative;max-width:1100px;margin:0 auto;padding:36px 40px 44px">
         <a class="ls-link" href="/parks/" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.92);font-weight:700;margin-bottom:120px;text-decoration:none">&larr; Back to all parks</a>
         <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-top:80px">
@@ -236,7 +248,14 @@ const officialSource =
       <!-- ===================== FROM THE TRAILS (gallery) ===================== -->
       <h3 style="font-size:21px;font-weight:800;letter-spacing:-.3px;margin:0 0 16px">From the trails</h3>
       <div class="ls-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:44px">
-        {editorialGallery.length > 0
+        {photoGallery.length > 0
+          ? photoGallery.map((ph) => (
+              <div style="position:relative;aspect-ratio:1/1;border:2px solid #1a1430;border-radius:12px;overflow:hidden;box-shadow:4px 4px 0 #1a1430">
+                <img src={ph.url} alt={ph.alt} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" loading="lazy" />
+                <PhotoCredit attribution={ph.attribution} source={ph.source} />
+              </div>
+            ))
+          : editorialGallery.length > 0
           ? editorialGallery.map((g) => (
               <div style="position:relative;aspect-ratio:1/1;border:2px solid #1a1430;border-radius:12px;overflow:hidden;box-shadow:4px 4px 0 #1a1430">
                 <Image src={g.src} alt={g.alt} widths={[220, 440, 660]} sizes="(max-width:620px) 100vw, 300px" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />

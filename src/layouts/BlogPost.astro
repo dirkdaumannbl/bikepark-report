@@ -3,6 +3,8 @@ import BaseLayout from './BaseLayout.astro';
 import { Image } from 'astro:assets';
 import { getEntry } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
+import PhotoCredit from '../components/PhotoCredit.astro';
+import { heroPhoto } from '../lib/photos';
 import { parkImage } from '../lib/stockImages';
 
 interface Props {
@@ -13,18 +15,18 @@ const fm = post.data;
 const fmt = (d: Date) =>
   d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-// Resolve linked park references to { slug, name } for the "Bikeparks in this
-// post" chips. name is verbatim HTML (overview.name) -> rendered with set:html.
-const linked = await Promise.all(
-  (fm.parks ?? []).map(async (ref) => {
-    const e = await getEntry(ref);
-    return e ? { slug: e.id, name: e.data.overview.name } : null;
-  })
-);
-const parks = linked.filter((p): p is { slug: string; name: string } => p !== null);
+// Resolve linked park references to their full entries (used for the "Bikeparks
+// in this post" chips + the hero-photo fallback below).
+const linkedEntries = (
+  await Promise.all((fm.parks ?? []).map((ref) => getEntry(ref)))
+).filter((e): e is CollectionEntry<'parks'> => e != null);
 
-// Hero image: the post's own cover when present, else a deterministic stock
-// hero keyed off the post slug (the design always shows a framed hero).
+// Chips: name is verbatim HTML (overview.name) -> rendered with set:html.
+const parks = linkedEntries.map((e) => ({ slug: e.id, name: e.data.overview.name }));
+
+// Hero image precedence: the post's own `cover` -> the first linked park's real
+// CC photo (credited) -> a deterministic stock hero keyed off the post slug.
+const linkedHero = linkedEntries.length ? heroPhoto(linkedEntries[0]) : null;
 const heroAlt = fm.title;
 const stockHero = parkImage(post.id, 'hero');
 const metaParts = [fmt(fm.date), ...fm.tags];
@@ -58,6 +60,13 @@ const metaParts = [fmt(fm.date), ...fm.tags];
           alt={heroAlt}
           style="width:100%;height:100%;object-fit:cover;display:block"
         />
+      ) : linkedHero ? (
+        <img
+          src={linkedHero.url}
+          alt={linkedHero.alt}
+          loading="lazy"
+          style="width:100%;height:100%;object-fit:cover;display:block"
+        />
       ) : (
         <img
           src={stockHero}
@@ -78,10 +87,14 @@ const metaParts = [fmt(fm.date), ...fm.tags];
           <svg width="30" height="30" viewBox="0 0 24 24" fill="#1a1430"><path d="M8 5v14l11-7z"></path></svg>
         </span>
       </div>
-      <span
-        style="position:absolute;bottom:14px;left:14px;background:rgba(18,18,27,.7);backdrop-filter:blur(6px);padding:5px 12px;border-radius:999px;color:#fff;font-size:12px"
-        >POV lap · drop your trail video here</span
-      >
+      {!fm.cover && linkedHero ? (
+        <PhotoCredit attribution={linkedHero.attribution} source={linkedHero.source} />
+      ) : (
+        <span
+          style="position:absolute;bottom:14px;left:14px;background:rgba(18,18,27,.7);backdrop-filter:blur(6px);padding:5px 12px;border-radius:999px;color:#fff;font-size:12px"
+          >POV lap · drop your trail video here</span
+        >
+      )}
     </div>
     {fm.description && (
       <p style="font-size:12px;color:#6f6c64;margin:0 0 28px">{fm.description}</p>
