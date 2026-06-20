@@ -566,13 +566,14 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
       if (geoReset) geoReset.hidden = true;
     }
 
-    // Round to 3 decimals so nearby visitors share a single CDN cache entry.
-    function round3(n) { return Math.round(n * 1000) / 1000; }
+    // Round to 2 decimals (~1 km) so nearby visitors share a single CDN cache
+    // entry — matches the server's coarsening and bounds the cacheable key space.
+    function round2(n) { return Math.round(n * 100) / 100; }
 
     function fetchDriveTimes(lat, lng) {
       setBtnBusy(true);
       showNotice('Finding nearby parks…');
-      return fetch('/api/drive-times?lat=' + round3(lat) + '&lng=' + round3(lng))
+      return fetch('/api/drive-times?lat=' + round2(lat) + '&lng=' + round2(lng))
         .then(function (res) {
           if (!res.ok) throw new Error('drive-times ' + res.status);
           return res.json();

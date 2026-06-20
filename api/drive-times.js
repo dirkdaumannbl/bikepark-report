@@ -41,11 +41,50 @@ function toFiniteNumber(raw) {
 }
 
 /**
+ * Host of the request's Origin (preferred) or Referer header, or null.
+ * @param {import('http').IncomingMessage} req
+ */
+function requestOriginHost(req) {
+  const src = req.headers.origin || req.headers.referer || req.headers.referrer;
+  if (!src) return null;
+  try {
+    return new URL(src).host.toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Same-origin guard: only serve callers coming from a page on this site
+ * (the deployment's own host, any *.vercel.app preview/prod, localhost in dev,
+ * or an optional configured custom domain). This filters off-site scrapers and
+ * bare `curl` (which send no Origin/Referer); it is NOT a defense against a
+ * determined attacker who spoofs headers — that's what the Routes API daily
+ * quota cap + rate limiting are for.
+ * @param {import('http').IncomingMessage} req
+ */
+function isAllowedOrigin(req) {
+  const host = requestOriginHost(req);
+  if (!host) return false;
+  const self = (req.headers.host || '').toLowerCase();
+  if (self && host === self) return true;
+  if (host.endsWith('.vercel.app')) return true;
+  if (host === 'localhost' || host.startsWith('localhost:')) return true;
+  const allow = process.env.ALLOWED_ORIGIN_HOST;
+  return Boolean(allow) && host === allow.toLowerCase();
+}
+
+/**
  * Vercel serverless handler: GET ?lat=&lng= → { origin, parks }.
  * @param {import('http').IncomingMessage & { query?: Record<string, string> }} req
  * @param {import('http').ServerResponse & { status: Function, json: Function, setHeader: Function }} res
  */
 export default async function handler(req, res) {
+  // --- 0) same-origin guard (blocks off-site / bare-curl callers) ---------
+  if (!isAllowedOrigin(req)) {
+    return res.status(403).json({ error: 'forbidden' });
+  }
+
   // --- 1) read + validate the visitor origin -----------------------------
   // Prefer Vercel's parsed req.query; fall back to parsing the URL ourselves
   // so the function also works under `vercel dev` / raw Node invocations.
@@ -69,6 +108,12 @@ export default async function handler(req, res) {
       .json({ error: 'lat/lng out of supported range' });
   }
 
+  // Coarsen to ~1 km (2 decimals): bounds the cacheable key space (nearby
+  // visitors share a CDN entry) and avoids sending precise device coordinates
+  // upstream to Google. The client rounds to the same precision.
+  const rLat = Math.round(lat * 100) / 100;
+  const rLng = Math.round(lng * 100) / 100;
+
   // --- 2) read the key (never echoed anywhere) ----------------------------
   const apiKey = process.env.GOOGLE_ROUTES_KEY;
   if (!apiKey) {
@@ -78,7 +123,7 @@ export default async function handler(req, res) {
   // --- 3) call Google Routes Compute Route Matrix -------------------------
   const body = {
     origins: [
-      { waypoint: { location: { latLng: { latitude: lat, longitude: lng } } } },
+      { waypoint: { location: { latLng: { latitude: rLat, longitude: rLng } } } },
     ],
     destinations: DESTINATIONS.map((g) => ({
       waypoint: { location: { latLng: { latitude: g.lat, longitude: g.lng } } },
@@ -140,5 +185,5 @@ export default async function handler(req, res) {
     'public, s-maxage=86400, stale-while-revalidate=604800',
   );
 
-  return res.status(200).json({ origin: { lat, lng }, parks });
+  return res.status(200).json({ origin: { lat: rLat, lng: rLng }, parks });
 }
