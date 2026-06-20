@@ -272,13 +272,13 @@ const officialSource =
 
       <!-- ===================== THE FACTS ===================== -->
       <h2 style="font-size:30px;font-weight:800;letter-spacing:-.7px;text-transform:uppercase;margin:0 0 18px">The facts</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:36px">
+      <div class="ls-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:36px">
         {factGroups.map((grp) => (
           <div style="background:#fff;border:2px solid #1a1430;border-radius:16px;box-shadow:4px 4px 0 #1a1430;overflow:hidden">
             <div style="background:#1a1430;color:#fff;font-size:12px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:11px 18px" set:html={grp.title} />
             <div style="padding:4px 18px 14px">
               {grp.rows.map((r) => (
-                <div style="display:flex;justify-content:space-between;gap:18px;padding:11px 0;border-bottom:1px solid #f0ebe0"><span style="font-size:13px;color:#7c7a72;flex:none">{r.k}</span><span style="font-size:13.5px;font-weight:600;text-align:right" set:html={r.v} /></div>
+                <div class="ls-fact-row" style="display:flex;justify-content:space-between;gap:18px;padding:11px 0;border-bottom:1px solid #f0ebe0"><span style="font-size:13px;color:#7c7a72;flex:none">{r.k}</span><span style="font-size:13.5px;font-weight:600;text-align:right" set:html={r.v} /></div>
               ))}
             </div>
           </div>

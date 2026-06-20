@@ -1,7 +1,7 @@
 ---
 /**
  * Home (`/`) — the design's `isHome` view (ls_sendsquad_new.html lines 79–197).
- * Hero with stock photo + diagonal gradients + floating badges + Rocco mascot,
+ * Hero with stock photo + diagonal gradients + floating badges + Shred Lasso mascot,
  * three value boxes, a FEATURED parks grid (prefer family_pick then top rating,
  * up to 6) and a CTA band. Markup + inline styles mirror the design; bindings
  * are wired to the `parks` content collection per the build contract.
@@ -97,7 +97,7 @@ const cards = featured.map((p) => {
       <span style="position:absolute;top:96px;right:288px;background:#ff5a4d;color:#fff;font-size:13px;font-weight:800;padding:8px 15px;border-radius:999px;animation:ls-float 5s ease-in-out infinite;box-shadow:3px 3px 0 #1a1430;border:2px solid #1a1430">Groms welcome!</span>
       <span style="position:absolute;top:124px;right:64px;background:#fff;color:#1a1430;font-size:13px;font-weight:800;padding:8px 15px;border-radius:999px;animation:ls-float 6s ease-in-out infinite;box-shadow:3px 3px 0 #1a1430;border:2px solid #1a1430">Riders from age 5</span>
       <div style="position:absolute;bottom:44px;right:76px">
-        <Mascot bubble="Let's find your trail!" caption="I'm Rocco" size={134} variant="sky" />
+        <Mascot bubble="Let's find your trail!" caption="I'm Shred Lasso" size={134} variant="sky" />
       </div>
     </section>
 
@@ -105,38 +105,26 @@ const cards = featured.map((p) => {
     <section style="max-width:1240px;margin:0 auto;padding:64px 40px 24px">
       <h2 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0">What LittleShredder gives you</h2>
       <div class="ls-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
-        <div style="position:relative;height:300px;border-radius:16px;overflow:hidden;border:2.5px solid #1a1430;box-shadow:6px 6px 0 #1a1430">
-          <img src="https://images.unsplash.com/photo-1572854875376-d4c543b06ea8?auto=format&fit=crop&w=1100&q=80" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
-          <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,27,.86) 5%,rgba(18,18,27,.15) 60%)"></div>
-          <div style="position:absolute;left:0;right:0;bottom:0;padding:24px">
-            <div style="display:inline-flex;width:40px;height:40px;border-radius:11px;background:#ff5a4d;align-items:center;justify-content:center;margin-bottom:12px">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
-            </div>
-            <h3 style="font-size:21px;font-weight:800;color:#fff;margin:0 0 6px;letter-spacing:-.3px">Compare at a glance</h3>
-            <p style="font-size:14px;line-height:1.45;color:rgba(255,255,255,.82);margin:0">Difficulty spread, kids' areas, lifts and drive time — side by side.</p>
-          </div>
+        <div class="ls-frame" style="background:#fff;padding:28px 26px;display:flex;flex-direction:column;gap:14px;height:100%">
+          <span style="display:inline-flex;width:56px;height:56px;border-radius:14px;background:#ff5a4d;align-items:center;justify-content:center;box-shadow:3px 3px 0 #1a1430;flex:none">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="3" y="10" width="4.6" height="11" rx="1.3"></rect><rect x="9.7" y="4" width="4.6" height="17" rx="1.3"></rect><rect x="16.4" y="13" width="4.6" height="8" rx="1.3"></rect></svg>
+          </span>
+          <h3 style="font-size:22px;font-weight:800;letter-spacing:-.4px;margin:0">Compare at a glance</h3>
+          <p style="font-size:15px;line-height:1.5;color:#5d5a52;margin:0">Difficulty spread, kids' areas, lifts and drive time — every park side by side.</p>
         </div>
-        <div style="position:relative;height:300px;border-radius:16px;overflow:hidden;border:2.5px solid #1a1430;box-shadow:6px 6px 0 #1a1430">
-          <img src="https://images.unsplash.com/photo-1650130504767-b5df679feff3?auto=format&fit=crop&w=1100&q=80" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
-          <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,27,.86) 5%,rgba(18,18,27,.15) 60%)"></div>
-          <div style="position:absolute;left:0;right:0;bottom:0;padding:24px">
-            <div style="display:inline-flex;width:40px;height:40px;border-radius:11px;background:#1fb6a6;align-items:center;justify-content:center;margin-bottom:12px">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
-            </div>
-            <h3 style="font-size:21px;font-weight:800;color:#fff;margin:0 0 6px;letter-spacing:-.3px">See it on the map</h3>
-            <p style="font-size:14px;line-height:1.45;color:rgba(255,255,255,.82);margin:0">Every park pinned across Europe with real drive times from home.</p>
-          </div>
+        <div class="ls-frame" style="background:#fff;padding:28px 26px;display:flex;flex-direction:column;gap:14px;height:100%">
+          <span style="display:inline-flex;width:56px;height:56px;border-radius:14px;background:#1fb6a6;align-items:center;justify-content:center;box-shadow:3px 3px 0 #1a1430;flex:none">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 2C7.6 2 4 5.6 4 10c0 5.6 6.4 10.9 7.3 11.6a1.1 1.1 0 0 0 1.4 0C13.6 20.9 20 15.6 20 10c0-4.4-3.6-8-8-8Zm0 10.6A2.6 2.6 0 1 1 12 7.4a2.6 2.6 0 0 1 0 5.2Z"></path></svg>
+          </span>
+          <h3 style="font-size:22px;font-weight:800;letter-spacing:-.4px;margin:0">See it on the map</h3>
+          <p style="font-size:15px;line-height:1.5;color:#5d5a52;margin:0">Every park pinned across Europe, with real drive times from your front door.</p>
         </div>
-        <div style="position:relative;height:300px;border-radius:16px;overflow:hidden;border:2.5px solid #1a1430;box-shadow:6px 6px 0 #1a1430">
-          <img src="https://images.unsplash.com/photo-1572853591097-89c78c5dd1e3?auto=format&fit=crop&w=1100&q=80" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
-          <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,27,.86) 5%,rgba(18,18,27,.15) 60%)"></div>
-          <div style="position:absolute;left:0;right:0;bottom:0;padding:24px">
-            <div style="display:inline-flex;width:40px;height:40px;border-radius:11px;background:#1a1430;align-items:center;justify-content:center;margin-bottom:12px">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2"><path d="M5 4h11l3 3v13H5z"></path><path d="M9 9h6M9 13h6M9 17h3"></path></svg>
-            </div>
-            <h3 style="font-size:21px;font-weight:800;color:#fff;margin:0 0 6px;letter-spacing:-.3px">Parent trail reports</h3>
-            <p style="font-size:14px;line-height:1.45;color:rgba(255,255,255,.82);margin:0">Videos and notes on which lines your kids can really handle.</p>
-          </div>
+        <div class="ls-frame" style="background:#fff;padding:28px 26px;display:flex;flex-direction:column;gap:14px;height:100%">
+          <span style="display:inline-flex;width:56px;height:56px;border-radius:14px;background:#1a1430;align-items:center;justify-content:center;box-shadow:3px 3px 0 #ff5a4d;flex:none">
+            <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="#fff"></circle><path d="M10 8.2v7.6l6.4-3.8z" fill="#1a1430"></path></svg>
+          </span>
+          <h3 style="font-size:22px;font-weight:800;letter-spacing:-.4px;margin:0">Parent trail reports</h3>
+          <p style="font-size:15px;line-height:1.5;color:#5d5a52;margin:0">Honest notes and clips on which lines your kids can actually handle.</p>
         </div>
       </div>
     </section>

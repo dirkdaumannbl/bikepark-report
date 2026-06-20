@@ -165,6 +165,12 @@ button:focus-visible,
 
 /* ---- fact card (detail "The facts") ---- */
 .ls-fact-card { overflow: hidden; }
+/* The facts: on narrow phones, stack each label/value row so long sourced values
+   don't collide with their label (was overflowing in the 2-col grid on mobile). */
+@media (max-width: 520px) {
+  .ls-fact-row { display: block !important; }
+  .ls-fact-row > span:last-child { display: block; text-align: left !important; margin-top: 2px; }
+}
 .ls-fact-card-head {
   background: var(--ls-ink);
   color: #fff;
