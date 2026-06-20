@@ -41,6 +41,16 @@ const parks = defineCollection({
     })).optional(),
     parent_notes: z.array(z.string()).optional(),
     blog_intro: z.string().optional(),
+    // Openly-licensed photos (Wikimedia Commons / CC / explicit free-to-use) — optional;
+    // each carries its license + attribution + source so the site can credit it.
+    photos: z.array(z.object({
+      url: z.string().url(),
+      thumb_url: z.string().url().optional(),
+      alt: z.string(),
+      license: z.string(),
+      attribution: z.string(),
+      source: z.string().url(),
+    })).optional(),
     overview: z.object({
       name: z.string(),
       cells: z.object({
