@@ -74,6 +74,42 @@ function isAllowedOrigin(req) {
   return Boolean(allow) && host === allow.toLowerCase();
 }
 
+// Per-IP rate limit via the Upstash REST API (no npm dependency). Fixed window:
+// at most RL_LIMIT requests per RL_WINDOW_S seconds per client IP. Fails OPEN —
+// if the store isn't configured or errors, we don't block (the Routes API daily
+// quota cap is the hard cost backstop). This stops casual single-source spam.
+const RL_LIMIT = 15;
+const RL_WINDOW_S = 10;
+
+/**
+ * @param {import('http').IncomingMessage} req
+ * @returns {Promise<boolean>} true if the request should be rejected (429)
+ */
+async function rateLimited(req) {
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return false; // store not configured → don't limit
+  const ip =
+    (req.headers['x-forwarded-for'] || '').split(',')[0].trim() ||
+    req.headers['x-real-ip'] ||
+    'unknown';
+  const windowId = Math.floor(Date.now() / 1000 / RL_WINDOW_S);
+  const key = encodeURIComponent(`drivetimes:${ip}:${windowId}`);
+  const auth = { headers: { Authorization: `Bearer ${token}` } };
+  try {
+    const r = await fetch(`${url}/incr/${key}`, auth);
+    if (!r.ok) return false; // store error → fail open
+    const { result } = await r.json();
+    if (result === 1) {
+      // first hit in this window → expire the key so counters reset
+      await fetch(`${url}/expire/${key}/${RL_WINDOW_S + 5}`, auth).catch(() => {});
+    }
+    return typeof result === 'number' && result > RL_LIMIT;
+  } catch {
+    return false; // network/parse failure → fail open
+  }
+}
+
 /**
  * Vercel serverless handler: GET ?lat=&lng= → { origin, parks }.
  * @param {import('http').IncomingMessage & { query?: Record<string, string> }} req
@@ -83,6 +119,12 @@ export default async function handler(req, res) {
   // --- 0) same-origin guard (blocks off-site / bare-curl callers) ---------
   if (!isAllowedOrigin(req)) {
     return res.status(403).json({ error: 'forbidden' });
+  }
+
+  // --- 0b) per-IP rate limit (Upstash REST; fail-open if absent) ----------
+  if (await rateLimited(req)) {
+    res.setHeader('Retry-After', String(RL_WINDOW_S));
+    return res.status(429).json({ error: 'rate limit exceeded' });
   }
 
   // --- 1) read + validate the visitor origin -----------------------------
