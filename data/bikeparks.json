@@ -10298,6 +10298,252 @@
           "title": "Pinkbike Directory &mdash; Trailpark Harz e.V. (community reviews, trail quality)"
         }
       ]
+    },
+    {
+      "id": 41,
+      "name": "Black Mountain Bikepark",
+      "region_label": "Elstra, Saxony, Germany",
+      "coords": {
+        "lat": 51.2175504,
+        "lng": 14.114826
+      },
+      "pin_name": "Black Mountain Bikepark",
+      "tagline": "A compact, lift-served Saxon hill park near Berlin with one genuinely gentle flow line and four rougher, fast race-bred trails.",
+      "local_name": "Black Mountain Bikepark Elstra",
+      "season": "Apr–Nov",
+      "family_pick": false,
+      "diff": {
+        "green": 1,
+        "blue": 2,
+        "red": 2,
+        "black": 0
+      },
+      "family_flags": [
+        {
+          "label": "Kids' rental bikes",
+          "ok": false
+        },
+        {
+          "label": "Magic-carpet skills area",
+          "ok": false
+        },
+        {
+          "label": "Lift carries kids",
+          "ok": true
+        },
+        {
+          "label": "Green flow from the top",
+          "ok": true
+        },
+        {
+          "label": "On-site coaching / school",
+          "ok": true
+        },
+        {
+          "label": "Toilets & café at base",
+          "ok": true
+        }
+      ],
+      "trail_spotlights": [
+        {
+          "name": "Flowline",
+          "color": "blue",
+          "length": "1500 m",
+          "note": "The park's longest, smoothest line – bermy and rollable with bumps only; the operator flags it as suitable for older children and beginners."
+        },
+        {
+          "name": "Pumptrack",
+          "color": "green",
+          "length": "380 m",
+          "note": "Free asphalt pumptrack at the base for first technique laps without buying a lift ticket – the gentlest option for small kids."
+        },
+        {
+          "name": "Jumpline",
+          "color": "red",
+          "length": "950 m",
+          "note": "Flow-and-style line with jumps, berms and drops – for confident riders, not first-timers."
+        }
+      ],
+      "parent_notes": [
+        "Open only Saturdays, Sundays and public holidays (10:00–18:00), April–November, and weather/event-dependent – check the site before driving.",
+        "Minors need a parent-signed consent form (Einvertändniserklärung), renewed each season; bring or print it in advance.",
+        "Uphill is a drag lift (Schlepplift), not a chair or gondola – small children may need help managing it; the operator calls it easy and provides a how-to video.",
+        "Aside from the Flowline and the free base pumptrack/playground, the four other trails are rated rough & fast and aimed at experienced riders.",
+        "The base has a bistro with vegan options and covered seating; the operator notes rental gear is not yet guaranteed (they were still seeking a partner), so plan to bring your own bike and protection."
+      ],
+      "blog_intro": "Only ~2 hours from Berlin, Black Mountain in Elstra is the closest real lift-served gravity park to the capital – but it's a small, race-flavoured hill rather than a big family resort. There's one long, gentle Flowline plus a free pumptrack and playground at the base that work nicely for older kids and beginners, while the other four trails are rough, fast and built for confident riders. With weekend-only opening, a drag lift, an on-site bike school and no magic-carpet beginner conveyor, it suits families with already-capable young riders more than absolute first-timers.",
+      "overview": {
+        "name": "Black Mountain Bikepark",
+        "cells": {
+          "location": "Elstra, Saxony, Germany &middot; Schwarzenberg (Westlausitz)",
+          "drive": "186 km<br>2:21 h <a class=\"src\" href=\"https://maps.googleapis.com/maps/api/directions/json?origin=Oskar-Helene-Park+7,+14195+Berlin&destination=51.2175504,14.114826&mode=driving\" target=\"_blank\" rel=\"noopener\">↗ Google Maps Directions API</a>",
+          "lift": "Drag lift (Schlepplift)",
+          "gravity_card": "<span class=\"pill no\">No</span>",
+          "difficulty": "<span class=\"badges\"><span class=\"badge b-green\"><span class=\"dot\"></span>1</span><span class=\"badge b-blue\"><span class=\"dot\"></span>2</span><span class=\"badge b-red\"><span class=\"dot\"></span>2</span></span>",
+          "vertical": "~125 m",
+          "skills": "<span class=\"pill no\">No</span>",
+          "rating": "<a href=\"https://www.bikepark-info.com/bikeparks/de/black-mountain-bikepark-elstra/\" target=\"_blank\" rel=\"noopener\">4.6/5</a>",
+          "best_for": "Closest-to-Berlin flow &amp; race trails"
+        },
+        "sort": {
+          "drive_km": 186,
+          "gravity_card": 0,
+          "difficulty": 5,
+          "vertical_m": 125,
+          "skills": 0,
+          "rating": 4.6
+        }
+      },
+      "groups": [
+        {
+          "title": "Access &amp; logistics",
+          "rows": [
+            {
+              "label": "Country",
+              "html": "Germany <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "State / region",
+              "html": "Saxony (Westlausitz / Oberlausitz) <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "City / nearest town",
+              "html": "Elstra (OT Talpenberg), Am Schwarzenberg / Berggäßchen, 01920 <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Mountain area",
+              "html": "Schwarzenberg (413 m), Westlausitz <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Coordinates",
+              "html": "51.2176, 14.1148 <a class=\"src\" href=\"https://maps.googleapis.com/maps/api/geocode/json?address=Black+Mountain+Bikepark%2C+Am+Schwarzenberg%2C+01920+Elstra%2C+Germany\" target=\"_blank\" rel=\"noopener\">↗ Google Geocoding API</a>"
+            },
+            {
+              "label": "Drive from Berlin",
+              "html": "186 km &middot; 2:21 h\n            <a class=\"src\" href=\"https://maps.googleapis.com/maps/api/directions/json?origin=Oskar-Helene-Park+7,+14195+Berlin&destination=51.2175504,14.114826&mode=driving\" target=\"_blank\" rel=\"noopener\">↗ Google Maps Directions API</a>"
+            },
+            {
+              "label": "Lift",
+              "html": "Drag lift (Schlepplift); ~160 m of uphill assist / ~125 m vertical served. Capacity <span class=\"nf\">Not found</span> <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup><sup class=\"ref\"><a href=\"#p41-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Season &amp; hours",
+              "html": "April–November; Sat, Sun &amp; public holidays 10:00–18:00, weather- and event-dependent <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Gravity Card",
+              "html": "<span class=\"pill no\">No</span> &mdash; not listed among the 32 Gravity Card parks for 2026 (the park hosts an unrelated “Gravity Cup” race) <sup class=\"ref\"><a href=\"#p41-s5\">[5]</a></sup><sup class=\"ref\"><a href=\"#p41-s6\">[6]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Trails",
+          "rows": [
+            {
+              "label": "Character",
+              "html": "A small, race-flavoured Saxon hill park: five purpose-built lines totalling 5,000+ m, mostly “rough &amp; fast” with one long smooth flow trail, plus a free asphalt pumptrack and playground at the base. <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Trail types",
+              "html": "Flow, jump line, freeride (rocks/roots/speed), plus a 380 m asphalt pumptrack <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Difficulty spread",
+              "html": "<span class=\"badges\"><span class=\"badge b-green\"><span class=\"dot\"></span>1</span><span class=\"badge b-blue\"><span class=\"dot\"></span>2</span><span class=\"badge b-red\"><span class=\"dot\"></span>2</span></span> &nbsp;(5 named trails — Flowline easy; Parkline/Freeride intermediate; Jumpline/Pro-Line intermediate–advanced; the operator does not use a strict green/blue/red colour scheme, so this is mapped from the stated profiles) <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup><sup class=\"ref\"><a href=\"#p41-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Vertical / longest",
+              "html": "~125 m vertical per line; longest descent is the Flowline at 1,500 m <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Features &amp; suitability",
+          "rows": [
+            {
+              "label": "Family friendly",
+              "html": "Partly — explicitly described as suitable for children and beginners on the Flowline, with a free base pumptrack and playground; but weekend-only opening, a drag lift and four rougher trails temper this. Minors need a parent-signed consent form. <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Beginner friendly",
+              "html": "Yes for the Flowline (flowy &amp; smooth, berms and rollers) and the free pumptrack; the other four trails are rated rough &amp; fast / intermediate–advanced <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Skills area",
+              "html": "<span class=\"pill no\">No</span> magic-carpet/conveyor belt; there is a 380 m asphalt pumptrack and a playground for practising at the base <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Standout features",
+              "html": "Pro-Line with drops, gaps and doubles incl. a ~10 m road gap; Jumpline for flow &amp; style; long 1,500 m Flowline <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup><sup class=\"ref\"><a href=\"#p41-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "On-site coaching",
+              "html": "Yes — Trail Active bike school (founded by operator Benjamin Ehrlich with Stefan Scherz; coach Willy Müller) offers technique courses <sup class=\"ref\"><a href=\"#p41-s2\">[2]</a></sup>"
+            }
+          ]
+        },
+        {
+          "title": "Practical",
+          "rows": [
+            {
+              "label": "Bike shop / rental",
+              "html": "Polygon rental bikes were advertised via online booking, though the operator noted it was still seeking an equipment-rental partner; a directory also lists on-site rental — confirm before visiting <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup><sup class=\"ref\"><a href=\"#p41-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Bike wash",
+              "html": "Listed as available by an independent directory; not confirmed on the operator site <sup class=\"ref\"><a href=\"#p41-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Food / facilities",
+              "html": "Base bistro with vegan options, covered seating, sanitary facilities and three parking areas (30–50 spaces each) <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Camper / camping",
+              "html": "No on-site camper pitches; nearby accommodation at Luxoase or Deutschbaselitz <sup class=\"ref\"><a href=\"#p41-s4\">[4]</a></sup>"
+            },
+            {
+              "label": "Prices",
+              "html": "Day €35 (€32 reduced); half-day €28/€27; 11-ride pass €30/€28; weekend €65/€60; single ride €5 <sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            },
+            {
+              "label": "Reputation / rating",
+              "html": "Very well reviewed locally; <a href=\"https://www.bikepark-info.com/bikeparks/de/black-mountain-bikepark-elstra/\" target=\"_blank\" rel=\"noopener\">4.6/5</a> on a bikepark directory and 100% recommended across 400+ Facebook reviews; serves 6,000+ visitors/year from DE/AT/CH/CZ/PL <sup class=\"ref\"><a href=\"#p41-s3\">[3]</a></sup><sup class=\"ref\"><a href=\"#p41-s1\">[1]</a></sup>"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "n": 1,
+          "url": "https://www.black-mountain-bikepark.de/",
+          "title": "Black Mountain Bikepark Elstra — official website (trails, lift, season, prices, facilities)"
+        },
+        {
+          "n": 2,
+          "url": "https://www.mtb-news.de/news/black-mountain-bikepark-elstra-neue-besitzer/",
+          "title": "MTB-News.de — Black Mountain BikePark Elstra: Neuer Besitzer, neue Saison! (operators, Trail Active bike school)"
+        },
+        {
+          "n": 3,
+          "url": "https://www.bikepark-info.com/bikeparks/de/black-mountain-bikepark-elstra/",
+          "title": "Bikepark-Info — Black Mountain Bikepark Elstra (rating 4.6/5)"
+        },
+        {
+          "n": 4,
+          "url": "https://bikepark-life.com/bikeparks/deutschland/bikepark-elstra/",
+          "title": "Bikepark-Life — Bikepark Elstra (Black Mountain) overview (lift/vertical, trails, wash, camping)"
+        },
+        {
+          "n": 5,
+          "url": "https://www.gravity-card.com/gravity-card-bikeparks/?lang=en",
+          "title": "Gravity Card — official partner-park list (Black Mountain not included)"
+        },
+        {
+          "n": 6,
+          "url": "https://www.mtb-news.de/news/gravity-card-2026/",
+          "title": "MTB-News.de — Gravity Card 2026: full 32-park network list"
+        }
+      ]
     }
   ]
 }
