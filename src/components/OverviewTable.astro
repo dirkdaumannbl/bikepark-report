@@ -43,6 +43,7 @@ const rows = parks.map((entry) => {
 
   return {
     slug: entry.id,
+    parkNo: entry.data.parkNo,
     nameHtml: entry.data.overview.name,
     liftHtml: cells.lift,
     bestForHtml: cells.best_for,
@@ -78,6 +79,32 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
     <span class="ov-result-count">{resultCount}</span> family-friendly parks. Sort or filter on any
     column — click a row for the full guide.
   </p>
+
+  {/* ---- live drive-times control (progressive enhancement; the SSR table
+       keeps its baked Berlin values when JS/geolocation is unavailable). The
+       button asks for the visitor's location, then the IIFE re-labels the Drive
+       column and refills it from the /api/drive-times serverless proxy. ---- */}
+  <div class="ov-geo" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+    <button
+      type="button"
+      class="ls-chip ov-geo-btn"
+      style="cursor:pointer;padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:inherit;border:1.5px solid #1a1430;background:#1a1430;color:#fff;transition:opacity .2s"
+      >📍 Drive times from where you are</button
+    >
+    <span
+      class="ov-geo-label"
+      aria-live="polite"
+      style="font-size:14px;font-weight:700;color:#5d5a52"
+      >from {homeBase}</span
+    >
+    <button
+      type="button"
+      hidden
+      class="ls-chip ov-geo-reset"
+      style="cursor:pointer;padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:inherit;border:1.5px solid #f1ddcf;background:#fff;color:#1a1430;transition:border-color .2s"
+      >↺ {homeBase}</button
+    >
+  </div>
 
   {/* ---- filter chips (client-driven; AND-combined with per-column filters).
        Rendered as <button> with aria-pressed so keyboard + AT users can toggle
@@ -137,7 +164,7 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
         <tr class="head" style="background:#1a1430;color:#fff">
           <th class="sortable" data-col="0" data-type="text" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Park</th>
           <th data-col="1" data-type="text" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Location</th>
-          <th class="sortable" data-col="2" data-type="num" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Drive from {homeBase}</th>
+          <th class="sortable ov-drive-head" data-col="2" data-type="num" data-home-label={`Drive from ${homeBase}`} style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Drive from {homeBase}</th>
           <th data-col="3" data-type="text" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Lift</th>
           <th data-col="4" data-type="num" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Gravity Card</th>
           <th data-col="5" data-type="num" style="text-align:left;padding:15px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap">Difficulty spread</th>
@@ -165,6 +192,7 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
             <tr
               class="ls-row"
               data-href={`/parks/${row.slug}/`}
+              data-park-id={String(row.parkNo)}
               data-country={row.dataCountry}
               data-gravity={row.dataGravity}
               data-hasblack={row.dataHasBlack}
@@ -433,5 +461,177 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
       if (countEl) countEl.textContent = String(visible);
     }
     if (filterRow) filterRow.addEventListener('input', applyFilters);
+
+    /* ---- live drive times from the visitor's location ----------------------
+       Progressive enhancement over the static Berlin values. On click we ask
+       for geolocation, round the coords (so nearby visitors share the CDN
+       cache), fetch the serverless proxy, and rewrite each row's Drive cell
+       (column index 2). The chosen origin is persisted so it sticks across
+       visits; the reset restores the baked Berlin cells. ---- */
+    var DRIVE_COL = 2;
+    var ORIGIN_KEY = 'ls-origin';
+    var geoBtn = root.querySelector('.ov-geo-btn');
+    var geoLabel = root.querySelector('.ov-geo-label');
+    var geoReset = root.querySelector('.ov-geo-reset');
+    var driveHead = headRow ? headRow.querySelector('.ov-drive-head') : null;
+    var homeLabel = driveHead ? (driveHead.getAttribute('data-home-label') || 'Drive') : 'Drive';
+    var homeBaseName = homeLabel.replace(/^Drive from\s*/i, '') || 'home';
+
+    // Captured ONCE, before any overwrite, so reset restores the exact SSR cells.
+    var originalDrive = null;
+    function captureOriginalDrive() {
+      if (originalDrive) return;
+      originalDrive = {};
+      dataRows().forEach(function (row) {
+        var id = row.getAttribute('data-park-id');
+        var cell = row.cells[DRIVE_COL];
+        if (id && cell) {
+          originalDrive[id] = { html: cell.innerHTML, sort: cell.getAttribute('data-sort') };
+        }
+      });
+    }
+
+    function setBtnBusy(busy) {
+      if (!geoBtn) return;
+      geoBtn.disabled = busy;
+      geoBtn.style.opacity = busy ? '0.6' : '1';
+      geoBtn.style.cursor = busy ? 'progress' : 'pointer';
+    }
+
+    // seconds → "H:MM" (e.g. 8460 → "2:21"); null/NaN → ''.
+    function fmtTime(seconds) {
+      if (seconds == null || isNaN(seconds)) return '';
+      var h = Math.floor(seconds / 3600);
+      var m = Math.round((seconds % 3600) / 60);
+      if (m === 60) { h += 1; m = 0; }
+      return h + ':' + (m < 10 ? '0' + m : m) + ' h';
+    }
+
+    // Fill the Drive cell with a "<km> km" line + a "<H:MM> h" line, and set
+    // data-sort to the km number so the existing numeric sort keeps working.
+    function fillDriveCell(cell, km, seconds) {
+      var line2 = fmtTime(seconds);
+      cell.setAttribute('data-sort', String(km));
+      var span = document.createElement('span');
+      span.style.color = '#6f6c64';
+      span.style.fontSize = '13px';
+      span.style.fontWeight = '400';
+      span.textContent = line2;
+      cell.textContent = km + ' km';
+      cell.appendChild(document.createElement('br'));
+      cell.appendChild(span);
+    }
+
+    function showNotice(msg) {
+      if (geoLabel) geoLabel.textContent = msg;
+    }
+
+    function applyDriveTimes(parks) {
+      captureOriginalDrive();
+      var byId = {};
+      parks.forEach(function (p) { byId[String(p.id)] = p; });
+      dataRows().forEach(function (row) {
+        var id = row.getAttribute('data-park-id');
+        var cell = row.cells[DRIVE_COL];
+        if (!id || !cell) return;
+        var p = byId[id];
+        // Leave the Berlin value for parks with no route / not returned.
+        if (!p || !p.ok || p.meters == null) return;
+        var km = Math.round(p.meters / 1000);
+        fillDriveCell(cell, km, p.seconds);
+      });
+      // Relabel the header and sort nearest-first via the existing mechanism.
+      if (driveHead) driveHead.textContent = 'Drive from you';
+      // Force ascending regardless of prior sort state on this column.
+      sortCol = -1;
+      sortBy(DRIVE_COL, 'num');
+      if (geoLabel) geoLabel.textContent = 'from your location';
+      if (geoReset) geoReset.hidden = false;
+    }
+
+    function restoreBerlin() {
+      if (originalDrive) {
+        dataRows().forEach(function (row) {
+          var id = row.getAttribute('data-park-id');
+          var cell = row.cells[DRIVE_COL];
+          var orig = id ? originalDrive[id] : null;
+          if (!cell || !orig) return;
+          cell.innerHTML = orig.html;
+          if (orig.sort === null) cell.removeAttribute('data-sort');
+          else cell.setAttribute('data-sort', orig.sort);
+        });
+      }
+      if (driveHead) driveHead.textContent = homeLabel;
+      if (geoLabel) geoLabel.textContent = 'from ' + homeBaseName;
+      if (geoReset) geoReset.hidden = true;
+    }
+
+    // Round to 3 decimals so nearby visitors share a single CDN cache entry.
+    function round3(n) { return Math.round(n * 1000) / 1000; }
+
+    function fetchDriveTimes(lat, lng) {
+      setBtnBusy(true);
+      showNotice('Finding nearby parks…');
+      return fetch('/api/drive-times?lat=' + round3(lat) + '&lng=' + round3(lng))
+        .then(function (res) {
+          if (!res.ok) throw new Error('drive-times ' + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          if (!data || !Array.isArray(data.parks)) throw new Error('bad payload');
+          applyDriveTimes(data.parks);
+          try {
+            localStorage.setItem(ORIGIN_KEY, JSON.stringify({ lat: lat, lng: lng }));
+          } catch (e) { /* private mode / storage disabled — non-fatal */ }
+        })
+        .catch(function () {
+          // Network/API failure: keep Berlin values, brief inline notice.
+          restoreBerlin();
+          showNotice('Couldn’t load live drive times — showing ' + homeBaseName + '.');
+        })
+        .then(function () { setBtnBusy(false); });
+    }
+
+    function requestLocation() {
+      if (!('geolocation' in navigator)) {
+        showNotice('Location unavailable — showing ' + homeBaseName + '.');
+        return;
+      }
+      setBtnBusy(true);
+      showNotice('Requesting your location…');
+      navigator.geolocation.getCurrentPosition(
+        function (pos) {
+          fetchDriveTimes(pos.coords.latitude, pos.coords.longitude);
+        },
+        function () {
+          // Denied or errored — revert to Berlin and explain briefly.
+          setBtnBusy(false);
+          restoreBerlin();
+          showNotice('Location denied — showing ' + homeBaseName + '.');
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 },
+      );
+    }
+
+    if (geoBtn) geoBtn.addEventListener('click', requestLocation);
+    if (geoReset) {
+      geoReset.addEventListener('click', function () {
+        try { localStorage.removeItem(ORIGIN_KEY); } catch (e) { /* non-fatal */ }
+        restoreBerlin();
+      });
+    }
+
+    // On load: if the visitor previously chose an origin, re-apply it so the
+    // live drive times stick across visits (re-fetch to keep them fresh).
+    (function autoApplyStoredOrigin() {
+      var raw;
+      try { raw = localStorage.getItem(ORIGIN_KEY); } catch (e) { return; }
+      if (!raw) return;
+      var saved;
+      try { saved = JSON.parse(raw); } catch (e) { return; }
+      if (saved && typeof saved.lat === 'number' && typeof saved.lng === 'number') {
+        fetchDriveTimes(saved.lat, saved.lng);
+      }
+    })();
   })();
 </script>
