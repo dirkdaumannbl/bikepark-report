@@ -171,6 +171,11 @@ button:focus-visible,
   .ls-fact-row { display: block !important; }
   .ls-fact-row > span:last-child { display: block; text-align: left !important; margin-top: 2px; }
 }
+/* Decorative home flair (mascot + floating badges) collides with the hero/CTA buttons
+   on small screens — show it only on wider viewports (matches the About-page mascot). */
+@media (max-width: 900px) {
+  .home-flair { display: none !important; }
+}
 .ls-fact-card-head {
   background: var(--ls-ink);
   color: #fff;
