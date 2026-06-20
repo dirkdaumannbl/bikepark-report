@@ -82,11 +82,14 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
 
   {/* ---- live drive-times control (progressive enhancement; the SSR table
        keeps its baked Berlin values when JS/geolocation is unavailable). The
-       button asks for the visitor's location, then the IIFE re-labels the Drive
-       column and refills it from the /api/drive-times serverless proxy. ---- */}
+       button now just OPENS the shared location dialog (in the nav) via
+       [data-ls-open]; the dialog owns geolocation + geocoding and broadcasts
+       `ls-origin-changed`, which the IIFE below listens for to re-label the
+       Drive column and refill it from the /api/drive-times serverless proxy. -- */}
   <div class="ov-geo" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
     <button
       type="button"
+      data-ls-open
       class="ls-chip ov-geo-btn"
       style="cursor:pointer;padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:inherit;border:1.5px solid #1a1430;background:#1a1430;color:#fff;transition:opacity .2s"
       >📍 Drive times from where you are</button
@@ -526,6 +529,11 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
       if (geoLabel) geoLabel.textContent = msg;
     }
 
+    // The label of the active origin, for the header + the inline notice. Set
+    // from the `ls-origin` value (or the `ls-origin-changed` detail); falls back
+    // to a generic phrase for the legacy {lat,lng}-only shape.
+    var originLabel = 'your location';
+
     function applyDriveTimes(parks) {
       captureOriginalDrive();
       var byId = {};
@@ -545,7 +553,7 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
       // Force ascending regardless of prior sort state on this column.
       sortCol = -1;
       sortBy(DRIVE_COL, 'num');
-      if (geoLabel) geoLabel.textContent = 'from your location';
+      if (geoLabel) geoLabel.textContent = 'from ' + originLabel;
       if (geoReset) geoReset.hidden = false;
     }
 
@@ -570,6 +578,8 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
     // entry — matches the server's coarsening and bounds the cacheable key space.
     function round2(n) { return Math.round(n * 100) / 100; }
 
+    // Fetch + apply for a rounded origin. Persistence is owned by the location
+    // dialog (which writes `ls-origin`); this only reads coords and paints.
     function fetchDriveTimes(lat, lng) {
       setBtnBusy(true);
       showNotice('Finding nearby parks…');
@@ -581,9 +591,6 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
         .then(function (data) {
           if (!data || !Array.isArray(data.parks)) throw new Error('bad payload');
           applyDriveTimes(data.parks);
-          try {
-            localStorage.setItem(ORIGIN_KEY, JSON.stringify({ lat: lat, lng: lng }));
-          } catch (e) { /* private mode / storage disabled — non-fatal */ }
         })
         .catch(function () {
           // Network/API failure: keep Berlin values, brief inline notice.
@@ -593,46 +600,50 @@ const numOrEmpty = (n: number | null | undefined) => (n == null ? '' : String(n)
         .then(function () { setBtnBusy(false); });
     }
 
-    function requestLocation() {
-      if (!('geolocation' in navigator)) {
-        showNotice('Location unavailable — showing ' + homeBaseName + '.');
-        return;
-      }
-      setBtnBusy(true);
-      showNotice('Requesting your location…');
-      navigator.geolocation.getCurrentPosition(
-        function (pos) {
-          fetchDriveTimes(pos.coords.latitude, pos.coords.longitude);
-        },
-        function () {
-          // Denied or errored — revert to Berlin and explain briefly.
-          setBtnBusy(false);
-          restoreBerlin();
-          showNotice('Location denied — showing ' + homeBaseName + '.');
-        },
-        { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 },
-      );
+    // Read `ls-origin`, tolerating the legacy {lat,lng} shape (label is new).
+    function readStoredOrigin() {
+      var raw;
+      try { raw = localStorage.getItem(ORIGIN_KEY); } catch (e) { return null; }
+      if (!raw) return null;
+      var o;
+      try { o = JSON.parse(raw); } catch (e) { return null; }
+      if (!o || typeof o.lat !== 'number' || typeof o.lng !== 'number') return null;
+      return {
+        lat: o.lat,
+        lng: o.lng,
+        label: typeof o.label === 'string' && o.label ? o.label : 'your location',
+      };
     }
 
-    if (geoBtn) geoBtn.addEventListener('click', requestLocation);
+    // Apply a resolved origin ({lat,lng,label}) to the table; null restores the
+    // baked Berlin cells/labels via the existing reset path.
+    function useOrigin(origin) {
+      if (origin && typeof origin.lat === 'number' && typeof origin.lng === 'number') {
+        originLabel = (typeof origin.label === 'string' && origin.label)
+          ? origin.label : 'your location';
+        fetchDriveTimes(origin.lat, origin.lng);
+      } else {
+        restoreBerlin();
+      }
+    }
+
+    // Clicking the legacy reset chip clears the origin and broadcasts null so
+    // the dialog chip + the per-park cards reset too (this table reacts via the
+    // `ls-origin-changed` listener below).
     if (geoReset) {
       geoReset.addEventListener('click', function () {
         try { localStorage.removeItem(ORIGIN_KEY); } catch (e) { /* non-fatal */ }
-        restoreBerlin();
+        window.dispatchEvent(new CustomEvent('ls-origin-changed', { detail: null }));
       });
     }
 
+    // React to origin changes from the shared location dialog.
+    window.addEventListener('ls-origin-changed', function (e) {
+      useOrigin(e && e.detail ? e.detail : null);
+    });
+
     // On load: if the visitor previously chose an origin, re-apply it so the
     // live drive times stick across visits (re-fetch to keep them fresh).
-    (function autoApplyStoredOrigin() {
-      var raw;
-      try { raw = localStorage.getItem(ORIGIN_KEY); } catch (e) { return; }
-      if (!raw) return;
-      var saved;
-      try { saved = JSON.parse(raw); } catch (e) { return; }
-      if (saved && typeof saved.lat === 'number' && typeof saved.lng === 'number') {
-        fetchDriveTimes(saved.lat, saved.lng);
-      }
-    })();
+    useOrigin(readStoredOrigin());
   })();
 </script>

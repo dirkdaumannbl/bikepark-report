@@ -160,37 +160,80 @@ const officialSource =
       </div>
 
       <script>
-        /* Per-park live drive time: if the visitor set a location on the Parks
-           page (localStorage `ls-origin`), reuse the same cached /api/drive-times
-           response to relabel this park's stat card "Drive from you". Silent
-           no-op when no origin is stored or the request fails (keeps Berlin). */
+        /* Per-park live drive time. Two triggers, both reusing the cached
+           /api/drive-times response keyed off the shared `ls-origin`:
+             1. On load — if an origin is stored, relabel this card "Drive from
+                you" with that origin's distance/time.
+             2. On `ls-origin-changed` (broadcast by the nav location dialog) —
+                re-fetch for a new origin, or restore the baked "Drive from
+                Berlin" values when the origin is reset to null.
+           The baked SSR values are captured ONCE before the first overwrite so
+           the reset is byte-for-byte exact. Silent no-op when no origin / on
+           request failure (keeps Berlin). */
         (function () {
           var card = document.querySelector('[data-drive-card]');
           if (!card) return;
           var pid = parseInt(card.getAttribute('data-park-id'), 10);
-          var raw;
-          try { raw = localStorage.getItem('ls-origin'); } catch (e) { return; }
-          if (!raw) return;
-          var o;
-          try { o = JSON.parse(raw); } catch (e) { return; }
-          if (!o || typeof o.lat !== 'number' || typeof o.lng !== 'number') return;
+          var labEl = card.querySelector('[data-drive-label]');
+          var valEl = card.querySelector('[data-drive-km]');
+          var subEl = card.querySelector('[data-drive-time]');
+
+          // Capture the original Berlin label/km/time ONCE, before any overwrite.
+          var original = null;
+          function captureOriginal() {
+            if (original) return;
+            original = {
+              label: labEl ? labEl.textContent : '',
+              km: valEl ? valEl.textContent : '',
+              time: subEl ? subEl.textContent : '',
+            };
+          }
+          function restoreOriginal() {
+            if (!original) return; /* never overwritten → already Berlin */
+            if (labEl) labEl.textContent = original.label;
+            if (valEl) valEl.textContent = original.km;
+            if (subEl) subEl.textContent = original.time;
+          }
+
           function r2(n) { return Math.round(n * 100) / 100; }
-          fetch('/api/drive-times?lat=' + r2(o.lat) + '&lng=' + r2(o.lng))
-            .then(function (res) { if (!res.ok) throw new Error('dt ' + res.status); return res.json(); })
-            .then(function (d) {
-              var hit = (d.parks || []).filter(function (p) { return p.id === pid && p.ok; })[0];
-              if (!hit || typeof hit.seconds !== 'number') return;
-              var km = Math.round(hit.meters / 1000);
-              var mins = Math.round(hit.seconds / 60);
-              var time = Math.floor(mins / 60) + ':' + ('0' + (mins % 60)).slice(-2) + ' h';
-              var lab = card.querySelector('[data-drive-label]');
-              var val = card.querySelector('[data-drive-km]');
-              var sub = card.querySelector('[data-drive-time]');
-              if (val) val.textContent = km + ' km';
-              if (sub) sub.textContent = time;
-              if (lab) lab.textContent = 'Drive from you';
-            })
-            .catch(function () { /* keep the Berlin default */ });
+
+          function applyOrigin(origin) {
+            if (!origin || typeof origin.lat !== 'number' || typeof origin.lng !== 'number') return;
+            fetch('/api/drive-times?lat=' + r2(origin.lat) + '&lng=' + r2(origin.lng))
+              .then(function (res) { if (!res.ok) throw new Error('dt ' + res.status); return res.json(); })
+              .then(function (d) {
+                var hit = (d.parks || []).filter(function (p) { return p.id === pid && p.ok; })[0];
+                if (!hit || typeof hit.seconds !== 'number') return;
+                captureOriginal();
+                var km = Math.round(hit.meters / 1000);
+                var mins = Math.round(hit.seconds / 60);
+                var time = Math.floor(mins / 60) + ':' + ('0' + (mins % 60)).slice(-2) + ' h';
+                if (valEl) valEl.textContent = km + ' km';
+                if (subEl) subEl.textContent = time;
+                if (labEl) labEl.textContent = 'Drive from you';
+              })
+              .catch(function () { /* keep the Berlin default */ });
+          }
+
+          function readStoredOrigin() {
+            var raw;
+            try { raw = localStorage.getItem('ls-origin'); } catch (e) { return null; }
+            if (!raw) return null;
+            var o;
+            try { o = JSON.parse(raw); } catch (e) { return null; }
+            if (!o || typeof o.lat !== 'number' || typeof o.lng !== 'number') return null;
+            return o;
+          }
+
+          // React to origin changes from the shared location dialog.
+          window.addEventListener('ls-origin-changed', function (e) {
+            var origin = e && e.detail ? e.detail : null;
+            if (origin) applyOrigin(origin);
+            else restoreOriginal();
+          });
+
+          // On load: apply any previously stored origin.
+          applyOrigin(readStoredOrigin());
         })();
       </script>
 

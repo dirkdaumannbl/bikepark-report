@@ -1,0 +1,369 @@
+---
+/**
+ * Location picker — a single source of truth for the visitor's "ride origin".
+ *
+ * Renders a neo-brutalist chip (`📍 <label>` / "Set your location") that opens a
+ * native <dialog> (showModal() → built-in focus-trap + Esc-to-close). The dialog
+ * lets the visitor either type an address (forward-geocoded via /api/geocode?q=)
+ * or tap "Use my current location" (browser geolocation → reverse-geocode via
+ * /api/geocode?lat&lng).
+ *
+ * Origin state contract (shared with OverviewTable + the per-park drive card):
+ *   - localStorage key  `ls-origin`  → { lat:number, lng:number, label:string }
+ *   - lat/lng rounded to 2 decimals before storing/sending (matches the server's
+ *     CDN cache key).
+ *   - On change, broadcasts `window.dispatchEvent(new CustomEvent(
+ *       'ls-origin-changed', { detail: origin | null }))` so the table and park
+ *     cards re-fetch live drive times (null = reset to the baked Berlin default).
+ *   - Exposes `window.lsOpenLocation()` and opens on any `[data-ls-open]` click,
+ *     so other surfaces (e.g. the Parks page button) can trigger it.
+ *
+ * Lives in the nav (rendered by SiteHeader → BaseLayout) so it's reachable on
+ * every page. Progressive enhancement: with JS off, the chip is an inert button
+ * and the SSR pages keep their baked Berlin drive values.
+ */
+---
+
+<div class="ls-loc" style="display:inline-flex">
+  <button
+    type="button"
+    data-ls-open
+    class="ls-chip ls-loc-trigger"
+    aria-haspopup="dialog"
+    style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;max-width:240px;padding:9px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:inherit;border:2px solid #1a1430;background:#fff;color:#1a1430;transition:border-color .2s"
+  >
+    <span aria-hidden="true">📍</span>
+    <span class="ls-loc-trigger-label" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Set your location</span>
+  </button>
+
+  <dialog
+    class="ls-loc-dialog"
+    aria-labelledby="ls-loc-title"
+    style="width:min(440px,calc(100vw - 32px));max-width:440px;padding:0;border:2.5px solid #1a1430;border-radius:16px;box-shadow:6px 6px 0 #1a1430;background:#fff;color:#1a1430;font-family:'Archivo',sans-serif"
+  >
+    <form method="dialog" class="ls-loc-form" style="margin:0;padding:24px">
+      <h2
+        id="ls-loc-title"
+        style="font-size:22px;font-weight:800;letter-spacing:-.4px;margin:0 0 4px;text-transform:uppercase"
+      >Where are you riding from?</h2>
+      <p style="font-size:14px;color:#5d5a52;margin:0 0 18px">
+        Type a town or address, or use your current location — we'll show drive
+        times from there.
+      </p>
+
+      <label
+        for="ls-loc-input"
+        style="display:block;font-size:13px;font-weight:700;margin:0 0 6px"
+      >Your location</label>
+      <input
+        id="ls-loc-input"
+        type="text"
+        class="ls-loc-input"
+        autocomplete="off"
+        placeholder="e.g. Munich, Germany"
+        style="width:100%;height:44px;padding:0 12px;border:2px solid #f1ddcf;border-radius:10px;font-size:15px;font-family:'Archivo',sans-serif;background:#fff;color:#1a1430"
+      />
+
+      <button
+        type="button"
+        class="ls-chip ls-loc-geo"
+        style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:9px 14px;border-radius:999px;font-size:13px;font-weight:700;font-family:inherit;border:2px solid #f1ddcf;background:#fff;color:#1a1430;transition:border-color .2s"
+      >📍 Use my current location</button>
+
+      <p
+        class="ls-loc-status"
+        aria-live="polite"
+        style="min-height:18px;margin:12px 0 0;font-size:13px;font-weight:600;color:#5d5a52"
+      ></p>
+
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;align-items:center">
+        <button
+          type="button"
+          class="ls-btn ls-loc-apply"
+          style="cursor:pointer;display:inline-flex;align-items:center;height:44px;padding:0 22px;border-radius:10px;background:#ff5a4d;color:#fff;font-size:14px;font-weight:800;font-family:inherit;border:0"
+        >Apply</button>
+        <button
+          type="button"
+          class="ls-chip ls-loc-default"
+          style="cursor:pointer;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:700;font-family:inherit;border:2px solid #f1ddcf;background:#fff;color:#1a1430;transition:border-color .2s"
+        >Use Berlin (default)</button>
+        <button
+          type="button"
+          class="ls-loc-cancel"
+          style="cursor:pointer;margin-left:auto;padding:9px 8px;font-size:13px;font-weight:700;font-family:inherit;border:0;background:none;color:#5d5a52;text-decoration:underline"
+        >Cancel</button>
+      </div>
+    </form>
+  </dialog>
+</div>
+
+<style>
+  /* Dim + center the modal (native ::backdrop) to match the brand surface. */
+  .ls-loc-dialog::backdrop {
+    background: rgba(26, 20, 48, 0.45);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+  .ls-loc-dialog[open] {
+    /* native <dialog> is auto-centered; this just guards against UA margins */
+    margin: auto;
+  }
+  .ls-loc-geo:hover,
+  .ls-loc-default:hover { border-color: #ff5a4d !important; }
+  .ls-loc-cancel:hover { color: #1a1430 !important; }
+</style>
+
+<script>
+  /* ---- Location picker: the single owner of `ls-origin` + the broadcaster of
+         the `ls-origin-changed` event the table + park cards listen for. ----- */
+  (function () {
+    var ORIGIN_KEY = 'ls-origin';
+    var GEOCODE_URL = '/api/geocode';
+
+    var trigger = document.querySelector('.ls-loc-trigger');
+    var triggerLabel = document.querySelector('.ls-loc-trigger-label');
+    var dialog = document.querySelector('.ls-loc-dialog');
+    var input = document.querySelector('.ls-loc-input');
+    var geoBtn = document.querySelector('.ls-loc-geo');
+    var applyBtn = document.querySelector('.ls-loc-apply');
+    var defaultBtn = document.querySelector('.ls-loc-default');
+    var cancelBtn = document.querySelector('.ls-loc-cancel');
+    var statusEl = document.querySelector('.ls-loc-status');
+
+    // Without a <dialog> we can't open the picker; bail (chip stays inert).
+    if (!dialog || typeof dialog.showModal !== 'function') return;
+
+    // Round to 2 decimals (~1 km) so nearby visitors share one CDN cache entry —
+    // matches the server's coarsening and the table's own rounding.
+    function round2(n) { return Math.round(n * 100) / 100; }
+
+    // Read `ls-origin`, tolerating the legacy {lat,lng} shape (label is new) and
+    // any garbage left by other versions. Returns {lat,lng,label} or null.
+    function readOrigin() {
+      var raw;
+      try { raw = localStorage.getItem(ORIGIN_KEY); } catch (e) { return null; }
+      if (!raw) return null;
+      var o;
+      try { o = JSON.parse(raw); } catch (e) { return null; }
+      if (!o || typeof o.lat !== 'number' || typeof o.lng !== 'number') return null;
+      return {
+        lat: o.lat,
+        lng: o.lng,
+        label: typeof o.label === 'string' && o.label ? o.label : 'your location',
+      };
+    }
+
+    function writeOrigin(origin) {
+      try { localStorage.setItem(ORIGIN_KEY, JSON.stringify(origin)); }
+      catch (e) { /* private mode / storage disabled — non-fatal */ }
+    }
+    function clearOrigin() {
+      try { localStorage.removeItem(ORIGIN_KEY); } catch (e) { /* non-fatal */ }
+    }
+
+    // Reflect the current origin on the nav chip.
+    function setTriggerLabel(origin) {
+      if (!triggerLabel) return;
+      triggerLabel.textContent = origin && origin.label ? origin.label : 'Set your location';
+    }
+
+    // Tell every listening surface (table + park cards) the origin changed.
+    function broadcast(origin) {
+      window.dispatchEvent(new CustomEvent('ls-origin-changed', { detail: origin }));
+    }
+
+    function setStatus(msg) {
+      if (statusEl) statusEl.textContent = msg || '';
+    }
+    function setBusy(busy) {
+      if (applyBtn) applyBtn.disabled = busy;
+      if (geoBtn) geoBtn.disabled = busy;
+      if (applyBtn) applyBtn.style.opacity = busy ? '0.6' : '1';
+    }
+
+    // Pending geolocated coords: set when "Use my current location" succeeds, so
+    // Apply can reuse them without re-geocoding the (unchanged) address text.
+    // `pendingGeoLabel` is the label that produced those coords — Apply reuses
+    // the coords only while the input still matches it (i.e. the user didn't
+    // retype). Any keystroke in the field clears the pending coords.
+    var pendingGeo = null; // { lat, lng } already rounded
+    var pendingGeoLabel = ''; // the label that pendingGeo was resolved to
+
+    function openDialog() {
+      pendingGeo = null;
+      pendingGeoLabel = '';
+      setStatus('');
+      setBusy(false);
+      var o = readOrigin();
+      if (input) input.value = o ? o.label : '';
+      setTriggerLabel(o);
+      dialog.showModal();
+      // Focus the input after the dialog is on-screen (native showModal moves
+      // focus to the first focusable child otherwise).
+      if (input) {
+        try { input.focus(); input.select(); } catch (e) { /* non-fatal */ }
+      }
+    }
+    function closeDialog() {
+      if (dialog.open) dialog.close();
+    }
+
+    // --- geocoding helpers ---------------------------------------------------
+    // Reverse geocode rounded coords → label; resolves to { lat, lng, label }.
+    function reverseGeocodeRaw(lat, lng) {
+      var rLat = round2(lat), rLng = round2(lng);
+      return fetch(GEOCODE_URL + '?lat=' + rLat + '&lng=' + rLng)
+        .then(function (res) {
+          if (!res.ok) throw new Error('geocode ' + res.status);
+          return res.json();
+        })
+        .then(function (d) {
+          if (!d || typeof d.lat !== 'number' || typeof d.lng !== 'number') {
+            throw new Error('bad payload');
+          }
+          return { lat: rLat, lng: rLng, label: d.label || 'your location' };
+        });
+    }
+    // Forward geocode an address → { lat, lng, label }. A 404 is surfaced as a
+    // typed Error so the caller can show the "couldn't find that" copy.
+    function forwardGeocode(q) {
+      return fetch(GEOCODE_URL + '?q=' + encodeURIComponent(q))
+        .then(function (res) {
+          if (res.status === 404) {
+            var notFound = new Error('not found');
+            notFound.code = 404;
+            throw notFound;
+          }
+          if (!res.ok) throw new Error('geocode ' + res.status);
+          return res.json();
+        })
+        .then(function (d) {
+          if (!d || typeof d.lat !== 'number' || typeof d.lng !== 'number') {
+            throw new Error('bad payload');
+          }
+          return { lat: round2(d.lat), lng: round2(d.lng), label: d.label || q };
+        });
+    }
+
+    // Commit a resolved origin: persist, relabel, broadcast, close.
+    function commit(origin) {
+      writeOrigin(origin);
+      setTriggerLabel(origin);
+      broadcast(origin);
+      closeDialog();
+    }
+
+    // --- "Use my current location" ------------------------------------------
+    function onUseMyLocation() {
+      if (!('geolocation' in navigator)) {
+        setStatus("Your browser can't share a location — type an address instead.");
+        return;
+      }
+      pendingGeo = null;
+      setBusy(true);
+      setStatus('Locating you…');
+      navigator.geolocation.getCurrentPosition(
+        function (pos) {
+          reverseGeocodeRaw(pos.coords.latitude, pos.coords.longitude)
+            .then(function (origin) {
+              pendingGeo = { lat: origin.lat, lng: origin.lng };
+              pendingGeoLabel = origin.label;
+              if (input) input.value = origin.label;
+              setStatus('Found you — tap Apply to use this.');
+            })
+            .catch(function () {
+              setStatus("We couldn't look up your location — try typing an address.");
+            })
+            .then(function () { setBusy(false); });
+        },
+        function () {
+          setBusy(false);
+          setStatus('Location access was blocked — type an address instead.');
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 },
+      );
+    }
+
+    // --- "Apply" -------------------------------------------------------------
+    function onApply() {
+      var typed = input ? input.value.trim() : '';
+      // If we have fresh geolocated coords AND the input still matches the label
+      // they produced (user didn't retype), trust those coords directly and skip
+      // a redundant forward-geocode round-trip.
+      if (pendingGeo && typed && typed === pendingGeoLabel) {
+        commit({ lat: pendingGeo.lat, lng: pendingGeo.lng, label: typed });
+        return;
+      }
+      if (!typed) {
+        setStatus('Type an address, or use your current location.');
+        return;
+      }
+      setBusy(true);
+      setStatus('Looking up that address…');
+      forwardGeocode(typed)
+        .then(function (origin) {
+          commit(origin);
+        })
+        .catch(function (err) {
+          if (err && err.code === 404) {
+            setStatus("We couldn't find that address — try adding a town/country.");
+          } else {
+            setStatus('Something went wrong — please try again.');
+          }
+        })
+        .then(function () { setBusy(false); });
+    }
+
+    // --- "Use Berlin (default)" ---------------------------------------------
+    function onUseDefault() {
+      clearOrigin();
+      pendingGeo = null;
+      setTriggerLabel(null);
+      if (input) input.value = '';
+      broadcast(null);
+      closeDialog();
+    }
+
+    // --- wiring --------------------------------------------------------------
+    if (geoBtn) geoBtn.addEventListener('click', onUseMyLocation);
+    if (applyBtn) applyBtn.addEventListener('click', onApply);
+    if (defaultBtn) defaultBtn.addEventListener('click', onUseDefault);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeDialog);
+
+    // Enter in the address field = Apply (don't submit the dialog form blindly).
+    // Any other edit invalidates the pending geolocated coords so Apply will
+    // forward-geocode the freshly-typed address instead.
+    if (input) {
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); onApply(); }
+      });
+      input.addEventListener('input', function () {
+        if (input.value.trim() !== pendingGeoLabel) {
+          pendingGeo = null;
+          pendingGeoLabel = '';
+        }
+      });
+    }
+
+    // Click on the backdrop (outside the form) closes without changes. The form
+    // fills the dialog, so any click landing on <dialog> itself is the backdrop.
+    dialog.addEventListener('click', function (e) {
+      if (e.target === dialog) closeDialog();
+    });
+
+    // Open via the chip, the global helper, or any [data-ls-open] element.
+    if (trigger) trigger.addEventListener('click', openDialog);
+    window.lsOpenLocation = openDialog;
+    document.addEventListener('click', function (e) {
+      var opener = e.target && e.target.closest ? e.target.closest('[data-ls-open]') : null;
+      // The trigger has its own listener; only handle *other* openers here.
+      if (opener && opener !== trigger) {
+        e.preventDefault();
+        openDialog();
+      }
+    });
+
+    // On load, reflect any stored origin on the chip.
+    setTriggerLabel(readOrigin());
+  })();
+</script>

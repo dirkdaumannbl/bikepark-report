@@ -4,6 +4,8 @@
  * real internal hrefs (root-absolute, no base path) with aria-current active
  * state, and the "Find a park" button.
  */
+import LocationDialog from './LocationDialog.astro';
+
 const path = Astro.url.pathname;
 
 const items = [
@@ -49,6 +51,7 @@ const isActive = (href: string) => {
         </a>
       ))
     }
+    <LocationDialog />
     <a
       href="/parks/"
       class="ls-btn"
