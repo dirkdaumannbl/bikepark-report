@@ -82,7 +82,7 @@ const postHero = new Map(
                   >Parent trail report</span
                 >
                 {!p.data.cover && hero && (
-                  <PhotoCredit attribution={hero.attribution} source={hero.source} compact />
+                  <PhotoCredit attribution={hero.attribution} source={hero.source} compact linked={false} />
                 )}
               </div>
               <div style="padding:20px 22px 22px;display:flex;flex-direction:column;flex:1">
