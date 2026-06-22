@@ -2,51 +2,57 @@
 /**
  * PhotoCredit — visible attribution for a real, openly-licensed photo.
  *
- * CC BY / CC BY-SA images legally REQUIRE a visible credit linking back to the
- * source, so this component is rendered wherever a `photos[]` image from
- * data/bikeparks.json is displayed. It is NEVER shown over a generic Unsplash /
- * stock fallback (those carry no such requirement).
+ * CC BY / CC BY-SA images require a visible credit, so this is rendered wherever
+ * a `photos[]` image from data/bikeparks.json is displayed. It is NEVER shown
+ * over a generic Unsplash / stock fallback.
  *
- * Renders a small, subtle pill anchored bottom-left over the image. The
- * attribution text (e.g. "Fantaglobe11, CC BY-SA 4.0, via Wikimedia Commons")
- * links to the file's `source` page. Styling matches the neo-brutalist theme:
- * the same dark blurred pill the existing gallery captions use, kept legible but
- * unobtrusive. The parent element must be `position:relative` (every call site
- * below already is).
+ * By default it renders a link to the source file page. When the credit sits
+ * INSIDE a clickable card (which is itself an <a>), pass `linked={false}` so it
+ * renders as plain text instead — nesting an <a> inside an <a> is invalid HTML
+ * and breaks the card layout. In that case the author is still credited visibly
+ * here, and the full clickable credit appears on the park's detail page.
+ *
+ * Renders a small, subtle pill anchored bottom-left over the image; the parent
+ * must be `position:relative` (every call site is).
  */
 interface Props {
-  /** Verbatim attribution string from the photo (plain text — set as text). */
+  /** Verbatim attribution string from the photo (plain text). */
   attribution: string;
-  /** Source / file page URL the credit links to. */
+  /** Source / file page URL the credit links to (when linked). */
   source: string;
   /** Tighter padding + smaller type for cramped corners (e.g. home cards). */
   compact?: boolean;
+  /** Render as a link (default) or plain text — set false inside a clickable card. */
+  linked?: boolean;
 }
 
-const { attribution, source, compact = false } = Astro.props;
+const { attribution, source, compact = false, linked = true } = Astro.props;
 const pad = compact ? '2px 7px' : '3px 9px';
 const fontSize = compact ? '10px' : '11px';
 const maxWidth = compact ? '70%' : '85%';
+const style = `position:absolute;bottom:8px;left:8px;z-index:2;max-width:${maxWidth};display:inline-flex;align-items:center;gap:4px;background:rgba(18,18,27,.7);backdrop-filter:blur(6px);padding:${pad};border-radius:999px;color:rgba(255,255,255,.92);font-size:${fontSize};font-weight:600;line-height:1.3;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis`;
 ---
 
-<a
-  class="ls-photo-credit"
-  href={source}
-  target="_blank"
-  rel="noopener nofollow"
-  title={attribution}
-  style={`position:absolute;bottom:8px;left:8px;z-index:2;max-width:${maxWidth};display:inline-flex;align-items:center;gap:4px;background:rgba(18,18,27,.7);backdrop-filter:blur(6px);padding:${pad};border-radius:999px;color:rgba(255,255,255,.92);font-size:${fontSize};font-weight:600;line-height:1.3;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis`}
->
-  <span aria-hidden="true" style="flex:none">📷</span>
-  <span style="overflow:hidden;text-overflow:ellipsis">{attribution}</span>
-</a>
+{
+  linked ? (
+    <a class="ls-photo-credit" href={source} target="_blank" rel="noopener nofollow" title={attribution} style={style}>
+      <span aria-hidden="true" style="flex:none">📷</span>
+      <span style="overflow:hidden;text-overflow:ellipsis">{attribution}</span>
+    </a>
+  ) : (
+    <span class="ls-photo-credit" title={attribution} style={style}>
+      <span aria-hidden="true" style="flex:none">📷</span>
+      <span style="overflow:hidden;text-overflow:ellipsis">{attribution}</span>
+    </span>
+  )
+}
 
 <style>
-  .ls-photo-credit:hover {
+  a.ls-photo-credit:hover {
     background: rgba(18, 18, 27, 0.88) !important;
     color: #fff !important;
   }
-  .ls-photo-credit:hover span:last-child {
+  a.ls-photo-credit:hover span:last-child {
     text-decoration: underline;
   }
 </style>

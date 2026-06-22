@@ -147,7 +147,7 @@ const cards = featured.map((p) => {
                 <span style="position:absolute;top:12px;left:12px;background:#ff5a4d;color:#fff;font-size:12px;font-weight:800;padding:4px 11px;border-radius:999px;border:2px solid #1a1430">Family pick</span>
               )}
               <span style="position:absolute;top:12px;right:12px;background:#fbf4ea;color:#1a1430;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;border:2px solid #1a1430">★ {p.rating}</span>
-              {p.photo && <PhotoCredit attribution={p.photo.attribution} source={p.photo.source} compact />}
+              {p.photo && <PhotoCredit attribution={p.photo.attribution} source={p.photo.source} compact linked={false} />}
             </div>
             <div style="padding:18px 20px 22px">
               <h3 style="font-size:20px;font-weight:800;letter-spacing:-.3px;margin:0 0 4px" set:html={p.name}></h3>
